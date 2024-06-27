@@ -1,7 +1,12 @@
+
+![pgRaw](https://github.com/knaadh/pg-raw/assets/16979444/baa9d8e3-9a6a-400b-a4f8-540d3b4dd9bb)
+
+# Pg-Raw
 A modern library for easily generating PostgreSQL raw queries through a clean and simple API.
 
 This isn't an ORM or query executor - it focuses solely on generating SQL strings, allowing you to execute these queries using Knex, Drizzle, Prisma, or your preferred PostgreSQL client or tool.
 
+## Table of Contents
 - [Installation](#installation)
 - [Usage](#usage)
 - [Features](#features)
