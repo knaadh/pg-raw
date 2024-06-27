@@ -1,0 +1,56 @@
+{
+	"name": "@knaadh/pg-raw",
+	"version": "1.0.0",
+	"author": "Mithlesh Jasrotia <mithleshjs@gmail.com>",
+	"license": "MIT",
+	"description": "A raw query builder for Postgres",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/knaadh/pg-raw.git"
+	},
+	"bugs": {
+		"url": "https://github.com/knaadh/pg-raw/issues"
+	},
+	"homepage": "https://github.com/knaadh/pg-raw",
+	"keywords": [
+		"postgres",
+		"query",
+		"builder",
+		"postgresql",
+		"database",
+		"query-string",
+		"raw-query"
+	],
+	"type": "module",
+	"main": "./dist/index.cjs",
+	"module": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"exports": {
+		"import": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.js"
+		},
+		"require": {
+			"types": "./dist/index.d.cts",
+			"require": "./dist/index.cjs"
+		}
+	},
+	"scripts": {
+		"format": "biome format",
+		"lint": "biome lint",
+		"check": "biome check",
+		"build": "tsup",
+		"publish:prepare": "bun run build && bun run scripts/prepare.ts",
+		"publish:local": "bun publish:prepare && npm publish ./dist --registry http://localhost:4873 --access public",
+		"publish:npm": "bun publish:prepare && npm publish ./dist --access public",
+		"local:registry": "verdaccio --config ./verdaccio.yaml"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "1.8.2",
+		"@types/bun": "latest",
+		"tsup": "^8.1.0",
+		"typescript": "^5.0.0",
+		"verdaccio": "^5.31.1"
+	},
+	"files": ["dist/*"]
+}
