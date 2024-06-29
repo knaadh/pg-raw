@@ -44,17 +44,26 @@
 		"publish:local": "bun publish:prepare && npm publish ./dist --registry http://localhost:4873 --access public",
 		"publish:npm": "bun publish:prepare && npm publish ./dist --access public",
 		"local:registry": "verdaccio --config ./verdaccio.yaml",
-		"prepare": "husky"
+		"prepare": "husky",
+		"cz": "git-cz"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "1.8.2",
 		"@commitlint/cli": "^19.3.0",
 		"@commitlint/config-conventional": "^19.2.2",
+		"@commitlint/cz-commitlint": "^19.2.0",
 		"@types/bun": "latest",
+		"commitizen": "^4.3.0",
 		"husky": "^9.0.11",
+		"inquirer": "9",
 		"tsup": "^8.1.0",
 		"typescript": "^5.0.0",
 		"verdaccio": "^5.31.1"
 	},
-	"files": ["dist/*"]
+	"files": ["dist/*"],
+	"config": {
+		"commitizen": {
+			"path": "@commitlint/cz-commitlint"
+		}
+	}
 }
