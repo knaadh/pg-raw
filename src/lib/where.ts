@@ -208,7 +208,7 @@ function whereSubQuery(
 
 	const relation = relations[relationKey];
 
-	if (relation.type === "MANY-MANY") {
+	if (relation.junction) {
 		return `${type}(${buildSelectQuery(
 			relation.junction.table,
 			subquery,

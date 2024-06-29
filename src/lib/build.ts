@@ -113,7 +113,7 @@ export function buildSelectQuery(
 		args.select = `${select(columns, table, "object", key)}`;
 		let innerSql: string;
 
-		if (relation.type === "MANY-MANY") {
+		if (relation.junction) {
 			args.select = `${select(
 				columns,
 				relation.junction.table,

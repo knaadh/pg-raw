@@ -11,7 +11,7 @@ const directRelation: Relation = {
 };
 
 const junctionRelation: Relation = {
-	type: "MANY-MANY",
+	type: "MANY",
 	table: "book",
 	field: "id",
 	referenceTable: "author",

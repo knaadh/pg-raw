@@ -45,27 +45,19 @@ export type Relations = {
 	[key: string]: Relation;
 };
 
-export type Relation = DirectRelation | JunctionRelation;
-
-export type DirectRelation = {
+export type Relation = {
 	type: "ONE" | "MANY";
 	table: string;
 	field: string;
 	referenceTable: string;
 	referenceField: string;
+	junction?: Junction;
 };
 
-export type JunctionRelation = {
-	type: "MANY-MANY";
+export type Junction = {
 	table: string;
 	field: string;
-	referenceTable: string;
 	referenceField: string;
-	junction: {
-		table: string;
-		field: string;
-		referenceField: string;
-	};
 };
 
 export type Include = {
@@ -130,13 +122,6 @@ export type OrderBy = {
 
 export type GroupBy = Array<string>;
 
-// export type WhereCondition = {
-//   [key: string]:
-//     | SingleKey<keyof QueryFilter, string | boolean | number>
-//     | string
-//     | boolean
-//     | number;
-// };
 export type WhereCondition = {
 	[key: string]: QueryFilter | string | boolean | number;
 };
@@ -149,8 +134,6 @@ export type NestedWhereCondition = {
 };
 
 export type QueryWhereCondition = WhereCondition | NestedWhereCondition;
-// | { exists: Record<string, Omit<SubQuery, 'select'>> }
-// | { notExists: Record<string, Omit<SubQuery, 'select'>> };
 
 export type SelectType = "simple" | "aggregated" | "object";
 

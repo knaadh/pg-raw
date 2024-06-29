@@ -11,7 +11,7 @@ const relations: Relations = {
 		referenceField: "id",
 	},
 	uploads: {
-		type: "MANY-MANY",
+		type: "MANY",
 		table: "uploads",
 		field: "id",
 		referenceTable: "users",

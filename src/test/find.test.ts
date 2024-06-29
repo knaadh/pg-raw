@@ -25,7 +25,7 @@ const relations: Relations = {
 		referenceField: "producer_id",
 	},
 	genre: {
-		type: "MANY-MANY",
+		type: "MANY",
 		table: "genre",
 		field: "id",
 		referenceTable: "artists",

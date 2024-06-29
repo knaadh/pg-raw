@@ -12,7 +12,7 @@ export function join(
 		}
 		return ` LEFT JOIN LATERAL (${query}) ON TRUE`;
 	}
-	if (relation.type === "MANY-MANY") {
+	if (relation.junction) {
 		return ` ${type} JOIN ${quoteIdentifier(
 			relation.junction.table,
 		)} ON ${connect(
