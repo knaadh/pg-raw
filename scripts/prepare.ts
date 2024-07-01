@@ -1,9 +1,37 @@
+type DistPackageJson = {
+	[key: string]: unknown;
+	name?: string;
+	version?: string;
+	type?: string;
+	author?: string;
+	license?: string;
+	description?: string;
+	repository?: string;
+	bugs?: string;
+	homepage?: string;
+	keywords?: string[];
+	dependencies?: Record<string, string>;
+	peerDependencies?: Record<string, string>;
+	main?: string;
+	types?: string;
+	exports?: {
+		import: {
+			types: string;
+			import: string;
+		};
+		require: {
+			types: string;
+			require: string;
+		};
+	};
+};
+
 const preparePackage = async () => {
 	try {
 		// Read the original package.json
 		const packageJson = JSON.parse(await Bun.file("package.json").text());
 
-		// Extract essential fields
+		// List of essential fields to copy from the original package.json
 		const essentialFields = [
 			"name",
 			"version",
@@ -19,19 +47,19 @@ const preparePackage = async () => {
 			"peerDependencies",
 		];
 
-		const distPackageJson: Record<string, unknown> = {};
+		// Create a new object to hold the filtered package.json data
+		const distPackageJson: DistPackageJson = {};
+
+		// Copy over only the essential fields
 		for (const field of essentialFields) {
 			if (packageJson[field]) {
 				distPackageJson[field] = packageJson[field];
 			}
 		}
-
-		// biome-ignore lint/complexity/useLiteralKeys: <explanation>
-		distPackageJson["main"] = "./index.js";
-		// biome-ignore lint/complexity/useLiteralKeys: <explanation>
-		distPackageJson["types"] = "./index.d.ts";
-		// biome-ignore lint/complexity/useLiteralKeys: <explanation>
-		distPackageJson["exports"] = {
+		// Add additional fields for the distribution package.json
+		distPackageJson.main = "./index.js";
+		distPackageJson.types = "./index.d.ts";
+		distPackageJson.exports = {
 			import: {
 				types: "./index.d.ts",
 				import: "./index.js",
@@ -41,13 +69,14 @@ const preparePackage = async () => {
 				require: "./index.cjs",
 			},
 		};
-		// Write the new package.json to dist folder
+
+		// Write the new package.json to the dist folder
 		await Bun.write(
 			"dist/package.json",
 			JSON.stringify(distPackageJson, null, 2),
 		);
 
-		// Copy README and LICENCE to dist folder
+		// Copy README and LICENSE files to the dist folder
 		await Bun.write(
 			"./dist/README.md",
 			await Bun.file("./README.md").arrayBuffer(),
@@ -63,4 +92,5 @@ const preparePackage = async () => {
 	}
 };
 
+// Run the preparePackage function
 preparePackage();
