@@ -46,7 +46,7 @@ export type Relations = {
 };
 
 export type Relation = {
-	type: "ONE" | "MANY";
+	type?: "ONE" | "MANY";
 	table: string;
 	field: string;
 	referenceTable: string;

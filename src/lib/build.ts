@@ -145,13 +145,10 @@ export function buildSelectQuery(
 			});
 		}
 
-		if (relation.type === "ONE") {
+		if (relation.type === "ONE" || relation.type === undefined) {
 			return `${select({ [key]: true }, `(${innerSql})`, "simple", key)} `;
 		}
-		//if (relation.type === 'MANY' || relation.type === 'MANY-MANY') {
 		return `${select(columns, `(${innerSql})`, "aggregated", key)} `;
-		//}
-		//return innerSql;
 	}
 
 	// Build final select query for non-nested
