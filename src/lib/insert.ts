@@ -3,7 +3,7 @@ import type { InsertManyParams, InsertOneParams } from "./types";
 import { quoteIdentifier } from "./util";
 
 export function insertOne(params: InsertOneParams): string {
-	const { table, data, select = [] } = params;
+	const { table, data, returning = [] } = params;
 
 	if (!table || table.trim() === "") {
 		throw new Error("Table name is missing or invalid");
@@ -20,15 +20,15 @@ export function insertOne(params: InsertOneParams): string {
 
 	const columns = buildColumns(Object.keys(data));
 	const values = buildValues(Object.values(data));
-	const returning =
-		select.length > 0 ? ` RETURNING ${buildColumns(select)}` : "";
+	const _returning =
+		returning.length > 0 ? ` RETURNING ${buildColumns(returning)}` : "";
 	return `INSERT INTO ${quoteIdentifier(
 		table,
-	)} (${columns}) VALUES (${values})${returning}`;
+	)} (${columns}) VALUES (${values})${_returning}`;
 }
 
 export function insertMany(params: InsertManyParams): string {
-	const { table, data, select = [] } = params;
+	const { table, data, returning = [] } = params;
 
 	if (!table || table.trim() === "") {
 		throw new Error("Table name is missing or invalid");
@@ -42,9 +42,9 @@ export function insertMany(params: InsertManyParams): string {
 	const values = data
 		.map((row) => `(${buildValues(Object.values(row))})`)
 		.join(", ");
-	const returning =
-		select.length > 0 ? ` RETURNING ${buildColumns(select)}` : "";
+	const _returning =
+		returning.length > 0 ? ` RETURNING ${buildColumns(returning)}` : "";
 	return `INSERT INTO ${quoteIdentifier(
 		table,
-	)} (${columns}) VALUES ${values}${returning}`;
+	)} (${columns}) VALUES ${values}${_returning}`;
 }

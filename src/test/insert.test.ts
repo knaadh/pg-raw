@@ -4,10 +4,10 @@ import type { InsertManyParams, InsertOneParams } from "../lib/types";
 
 describe("insertOne", () => {
 	it("should generate a correct SQL query with valid inputs", () => {
-		const params = {
+		const params: InsertOneParams = {
 			table: "users",
 			data: { name: "John Doe", age: 30 },
-			select: ["id", "name"],
+			returning: ["id", "name"],
 		};
 
 		const expectedQuery =
@@ -15,11 +15,11 @@ describe("insertOne", () => {
 		expect(insertOne(params)).toBe(expectedQuery);
 	});
 
-	it("should generate a correct SQL query without select statement", () => {
-		const params = {
+	it("should generate a correct SQL query without returning statement", () => {
+		const params: InsertOneParams = {
 			table: "users",
 			data: { name: "John Doe", age: 30 },
-			select: [],
+			returning: [],
 		};
 
 		const expectedQuery =
@@ -28,20 +28,20 @@ describe("insertOne", () => {
 	});
 
 	it("should throw an error if table name is missing", () => {
-		const params = {
+		const params: InsertOneParams = {
 			table: "",
 			data: { name: "John Doe", age: 30 },
-			select: [],
+			returning: [],
 		};
 
 		expect(() => insertOne(params)).toThrow("Table name is missing or invalid");
 	});
 
 	it("should throw an error if data object is empty", () => {
-		const params = {
+		const params: InsertOneParams = {
 			table: "users",
 			data: {},
-			select: [],
+			returning: [],
 		};
 
 		expect(() => insertOne(params)).toThrow(
@@ -50,10 +50,10 @@ describe("insertOne", () => {
 	});
 
 	it("should throw an error if data is not an object", () => {
-		const params = {
+		const params: InsertOneParams = {
 			table: "users",
 			data: "invalid-data" as never,
-			select: [],
+			returning: [],
 		};
 
 		expect(() => insertOne(params)).toThrow(
@@ -62,10 +62,10 @@ describe("insertOne", () => {
 	});
 
 	it("should throw an error if data is an array", () => {
-		const params = {
+		const params: InsertOneParams = {
 			table: "users",
 			data: [] as never,
-			select: [],
+			returning: [],
 		};
 
 		expect(() => insertOne(params)).toThrow(
@@ -77,7 +77,7 @@ describe("insertOne", () => {
 		const params: InsertOneParams = {
 			table: "users",
 			data: { name: null, age: undefined },
-			select: [],
+			returning: [],
 		};
 
 		const expectedQuery =
@@ -86,10 +86,10 @@ describe("insertOne", () => {
 	});
 
 	it("should escape single quotes in string values", () => {
-		const params = {
+		const params: InsertOneParams = {
 			table: "users",
 			data: { name: "Smith's" },
-			select: [],
+			returning: [],
 		};
 
 		const expectedQuery =
@@ -106,7 +106,7 @@ describe("insertMany", () => {
 				{ name: "John Doe", age: 30 },
 				{ name: "Jane Smith", age: 25 },
 			],
-			select: ["id", "name"],
+			returning: ["id", "name"],
 		};
 
 		const expectedQuery =
@@ -114,14 +114,14 @@ describe("insertMany", () => {
 		expect(insertMany(params)).toBe(expectedQuery);
 	});
 
-	it("should generate a correct SQL query without select statement", () => {
+	it("should generate a correct SQL query without returning statement", () => {
 		const params: InsertManyParams = {
 			table: "users",
 			data: [
 				{ name: "John Doe", age: 30 },
 				{ name: "Jane Smith", age: 25 },
 			],
-			select: [],
+			returning: [],
 		};
 
 		const expectedQuery =
@@ -133,7 +133,7 @@ describe("insertMany", () => {
 		const params: InsertManyParams = {
 			table: "",
 			data: [{ name: "John Doe", age: 30 }],
-			select: [],
+			returning: [],
 		};
 
 		expect(() => insertMany(params)).toThrow(
@@ -145,7 +145,7 @@ describe("insertMany", () => {
 		const params: InsertManyParams = {
 			table: "users",
 			data: {} as never,
-			select: [],
+			returning: [],
 		};
 
 		expect(() => insertMany(params)).toThrow("Data must be a non-empty array");
@@ -155,7 +155,7 @@ describe("insertMany", () => {
 		const params: InsertManyParams = {
 			table: "users",
 			data: [],
-			select: [],
+			returning: [],
 		};
 
 		expect(() => insertMany(params)).toThrow("Data must be a non-empty array");
@@ -168,7 +168,7 @@ describe("insertMany", () => {
 				{ name: null, age: undefined },
 				{ name: "Jane Smith", age: 25 },
 			],
-			select: [],
+			returning: [],
 		};
 
 		const expectedQuery =
@@ -183,7 +183,7 @@ describe("insertMany", () => {
 				{ name: "Smith's", age: 30 },
 				{ name: "Jane Smith", age: 25 },
 			],
-			select: [],
+			returning: [],
 		};
 
 		const expectedQuery =

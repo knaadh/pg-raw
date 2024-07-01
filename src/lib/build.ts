@@ -163,12 +163,12 @@ export function buildSelectQuery(
 
 export function buildDeleteQuery(
 	table: string,
-	query: DeleteQuery,
+	query?: DeleteQuery,
 	relations?: Relations,
 ) {
 	const args: SqlParams = {
 		delete: `DELETE FROM ${quoteIdentifier(table)}`,
-		where: query.where,
+		where: query?.where || {},
 		returning: query?.returning || [],
 		relations: relations,
 		join: "",

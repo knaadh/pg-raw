@@ -153,22 +153,22 @@ export type SqlParams = {
 export type InsertOneParams = {
 	table: string;
 	data: Record<string, string | number | boolean | object | null | undefined>;
-	select?: string[];
+	returning?: string[];
 };
 
 export type InsertManyParams = {
 	table: string;
 	data: Array<string | number | boolean | object>;
-	select?: string[];
+	returning?: string[];
 };
 
 export type DeleteManyParams = {
 	table: string;
-	query: DeleteQuery;
+	query?: DeleteQuery;
 	relations?: Relations;
 };
 
 export type DeleteQuery = {
-	returning?: Array<string>;
 	where?: QueryWhereCondition;
+	returning?: string[];
 };
