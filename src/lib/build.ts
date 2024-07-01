@@ -9,6 +9,7 @@ import type {
 	Relations,
 	SelectQuery,
 	SqlParams,
+	UpdateQuery,
 } from "./types.ts";
 import { connect, formatValue, quoteIdentifier } from "./util";
 import { where } from "./where";
@@ -174,6 +175,21 @@ export function buildDeleteQuery(
 	return sql(args);
 }
 
+export function buildUpdateQuery(
+	table: string,
+	query: UpdateQuery,
+	relations?: Relations,
+) {
+	const args: SqlParams = {
+		update: `UPDATE ${quoteIdentifier(table)} SET ${buildUpdateValues(query.data)}`,
+		where: query?.where || {},
+		returning: query?.returning || [],
+		relations: relations,
+	};
+
+	return sql(args);
+}
+
 export function sql(
 	params: SqlParams,
 	append?: {
@@ -181,7 +197,7 @@ export function sql(
 		join?: string;
 	},
 ): string {
-	let sql = `${params?.select || params?.delete || ""}`;
+	let sql = `${params?.select || params?.delete || params?.update || ""}`;
 	if (params.join) {
 		sql += `${params.join}`;
 	}
@@ -230,4 +246,10 @@ export function buildColumns(columns: Array<unknown>): string {
  */
 export function buildValues(values: Array<unknown>): string {
 	return values.map((value) => formatValue(value)).join(", ");
+}
+
+export function buildUpdateValues(data: Record<string, unknown>): string {
+	return Object.entries(data)
+		.map(([key, value]) => `${quoteIdentifier(key)} = ${formatValue(value)}`)
+		.join(", ");
 }

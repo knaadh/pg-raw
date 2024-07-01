@@ -3,6 +3,7 @@ import { describe, expect, it } from "bun:test";
 import {
 	buildColumns,
 	buildDeleteQuery,
+	buildUpdateValues,
 	buildValues,
 	sql,
 } from "../lib/build.ts";
@@ -178,5 +179,32 @@ describe("buildValues", () => {
 		const values = ["apple", 3.14, false];
 		const result = buildValues(values);
 		expect(result).toBe("'apple', 3.14, false");
+	});
+});
+
+describe("buildUpdateValues", () => {
+	it("should correctly format a simple object with string values", () => {
+		const data = { name: "Alice", age: "30" };
+		expect(buildUpdateValues(data)).toBe(`"name" = 'Alice', "age" = '30'`);
+	});
+
+	it("should correctly handle numeric and null values", () => {
+		const data = { age: 25, status: null };
+		expect(buildUpdateValues(data)).toBe(`"age" = 25, "status" = NULL`);
+	});
+
+	it("should handle special characters in strings", () => {
+		const data = { bio: "O'Reilly" };
+		expect(buildUpdateValues(data)).toBe(`"bio" = 'O''Reilly'`);
+	});
+
+	it("should return an empty string when data is an empty object", () => {
+		const data = {};
+		expect(buildUpdateValues(data)).toBe("");
+	});
+
+	it("should handle boolean values", () => {
+		const data = { active: true, retired: false };
+		expect(buildUpdateValues(data)).toBe(`"active" = true, "retired" = false`);
 	});
 });

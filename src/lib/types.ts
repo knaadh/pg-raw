@@ -140,6 +140,7 @@ export type SelectType = "simple" | "aggregated" | "object";
 export type SqlParams = {
 	select?: string;
 	delete?: string;
+	update?: string;
 	join?: string | null;
 	where?: QueryWhereCondition;
 	limit?: number;
@@ -159,6 +160,18 @@ export type InsertOneParams = {
 export type InsertManyParams = {
 	table: string;
 	data: Array<string | number | boolean | object>;
+	returning?: string[];
+};
+
+export type UpdateManyParams = {
+	table: string;
+	query: UpdateQuery;
+	relations?: Relations;
+};
+
+export type UpdateQuery = {
+	data: Record<string, string | number | boolean | object | null | undefined>;
+	where?: QueryWhereCondition;
 	returning?: string[];
 };
 
