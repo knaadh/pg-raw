@@ -16,16 +16,17 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3 # Updated to Node.js 20
 
       - name: Install Bun
         run: |
           curl -fsSL https://bun.sh/install | bash
-          echo 'export BUN_INSTALL="$HOME/.bun"' >> $GITHUB_ENV
-          echo 'export PATH="$BUN_INSTALL/bin:$PATH"' >> $GITHUB_ENV
+          echo 'BUN_INSTALL="$HOME/.bun"' >> $GITHUB_ENV
+          echo 'PATH="$BUN_INSTALL/bin:$PATH"' >> $GITHUB_ENV
+        shell: bash
 
       - name: Cache Bun dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v3 # Updated to Node.js 20
         with:
           path: ~/.bun
           key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lockb') }}
@@ -45,7 +46,7 @@ jobs:
         run: bun test
 
       - name: Upload coverage report
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3 # Updated to Node.js 20
         with:
           name: coverage-report
           path: ./coverage
