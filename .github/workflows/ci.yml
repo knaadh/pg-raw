@@ -4,11 +4,9 @@ on:
   push:
     branches:
       - main
-      - test-ci-setup
   pull_request:
     branches:
       - main
-      - test-ci-setup
 
 jobs:
   build:
@@ -16,7 +14,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - uses: oven-sh/setup-bun@v2
         with:
@@ -35,7 +33,7 @@ jobs:
         run: bun test
 
       - name: Upload coverage report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: coverage-report
           path: ./coverage
