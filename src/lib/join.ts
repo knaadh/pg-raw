@@ -17,14 +17,14 @@ export function join(
 			relation.junction.table,
 		)} ON ${connect(
 			relation.junction.table,
-			relation.junction.field,
-			relation.table,
-			relation.field,
-		)} ${type} JOIN ${quoteIdentifier(relation.referenceTable)} ON ${connect(
-			relation.junction.table,
 			relation.junction.referenceField,
 			relation.referenceTable,
 			relation.referenceField,
+		)} ${type} JOIN ${quoteIdentifier(relation.table)} ON ${connect(
+			relation.junction.table,
+			relation.junction.field,
+			relation.table,
+			relation.field,
 		)}`;
 	}
 	return ` ${type} JOIN ${quoteIdentifier(relation.table)} ON ${connect(

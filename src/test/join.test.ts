@@ -55,7 +55,7 @@ describe("join", () => {
 
 	it("should generate correct join for MANY-MANY relation", () => {
 		const type = "LEFT";
-		const expected = ` LEFT JOIN "book_author" ON "book_author"."book_id" = "book"."id" LEFT JOIN "author" ON "book_author"."author_id" = "author"."id"`;
+		const expected = ` LEFT JOIN "book_author" ON "book_author"."author_id" = "author"."id" LEFT JOIN "book" ON "book_author"."book_id" = "book"."id"`;
 		const result = join(type, junctionRelation);
 		expect(result).toBe(expected);
 	});
@@ -77,9 +77,9 @@ describe("join", () => {
 	it("should generate correct junction join for other types (INNER, RIGHT, FULL)", () => {
 		const types = ["INNER", "RIGHT", "FULL"] as const;
 		const expected = {
-			INNER: ` INNER JOIN "book_author" ON "book_author"."book_id" = "book"."id" INNER JOIN "author" ON "book_author"."author_id" = "author"."id"`,
-			RIGHT: ` RIGHT JOIN "book_author" ON "book_author"."book_id" = "book"."id" RIGHT JOIN "author" ON "book_author"."author_id" = "author"."id"`,
-			FULL: ` FULL JOIN "book_author" ON "book_author"."book_id" = "book"."id" FULL JOIN "author" ON "book_author"."author_id" = "author"."id"`,
+			INNER: ` INNER JOIN "book_author" ON "book_author"."author_id" = "author"."id" INNER JOIN "book" ON "book_author"."book_id" = "book"."id"`,
+			RIGHT: ` RIGHT JOIN "book_author" ON "book_author"."author_id" = "author"."id" RIGHT JOIN "book" ON "book_author"."book_id" = "book"."id"`,
+			FULL: ` FULL JOIN "book_author" ON "book_author"."author_id" = "author"."id" FULL JOIN "book" ON "book_author"."book_id" = "book"."id"`,
 		};
 
 		for (const type of types) {
