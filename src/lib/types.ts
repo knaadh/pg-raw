@@ -71,6 +71,7 @@ export type IncludeQuery = {
 	offset?: number;
 	include?: Include;
 	groupBy?: string[];
+	having?: QueryHavingCondition;
 	orderBy?: OrderBy;
 	leftJoin?: Join;
 	rightJoin?: Join;
@@ -95,6 +96,7 @@ export type SelectQuery = {
 	offset?: number;
 	include?: Include;
 	groupBy?: string[];
+	having?: QueryHavingCondition;
 	orderBy?: OrderBy;
 	leftJoin?: Join;
 	rightJoin?: Join;
@@ -135,6 +137,10 @@ export type NestedWhereCondition = {
 
 export type QueryWhereCondition = WhereCondition | NestedWhereCondition;
 
+export type QueryHavingCondition =
+	| WhereCondition
+	| Omit<NestedWhereCondition, "exists">;
+
 export type SelectType = "simple" | "aggregated" | "object";
 
 export type SqlParams = {
@@ -146,6 +152,7 @@ export type SqlParams = {
 	limit?: number;
 	offset?: number;
 	groupBy?: GroupBy;
+	having?: QueryHavingCondition;
 	orderBy?: OrderBy;
 	relations?: Relations;
 	returning?: Array<string>;

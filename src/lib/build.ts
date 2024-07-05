@@ -37,6 +37,7 @@ export function buildSelectQuery(
 		select: "",
 		where: query.where,
 		groupBy: query.groupBy,
+		having: query.having,
 		orderBy: query.orderBy,
 		limit: query.limit,
 		offset: query.offset,
@@ -212,6 +213,9 @@ export function sql(
 	}
 	if (params.groupBy && params.groupBy.length > 0) {
 		sql += ` GROUP BY ${group(params.groupBy)}`;
+	}
+	if (params.having && Object.keys(params.having).length > 0) {
+		sql += ` HAVING ${where(params.having, "AND", params.relations || {})}`;
 	}
 	if (params.orderBy && Object.keys(params.orderBy).length > 0) {
 		sql += ` ORDER BY ${order(params.orderBy)}`;
