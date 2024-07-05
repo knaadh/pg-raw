@@ -174,3 +174,6 @@ tmp
 
 # Finder (MacOS) folder config
 .DS_Store
+
+# NPM Lockfile
+package-lock.json
