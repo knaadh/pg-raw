@@ -192,3 +192,76 @@ export type DeleteQuery = {
 	where?: QueryWhereCondition;
 	returning?: string[];
 };
+
+export type PgFunction =
+	// Mathematical Functions
+
+	| "ABS"
+	| "CEIL"
+	| "FLOOR"
+	| "ROUND"
+	| "SQRT"
+	| "EXP"
+	| "LN"
+	| "LOG"
+	| "POWER"
+	| "SIGN"
+	| "CBRT"
+	| "RANDOM"
+
+	// String Functions
+	| "LENGTH"
+	| "SUBSTRING"
+	| "TRIM"
+	| "LOWER"
+	| "UPPER"
+	| "CONCAT"
+	| "REPLACE"
+	| "POSITION"
+	| "CHAR_LENGTH"
+	| "REVERSE"
+	| "SPLIT_PART"
+	| "INITCAP"
+	| "LTRIM"
+	| "RTRIM"
+
+	// Date and Time Functions
+	| "CURRENT_DATE"
+	| "CURRENT_TIME"
+	| "EXTRACT"
+	| "DATE_PART"
+	| "AGE"
+	| "NOW"
+	| "DATE_TRUNC"
+	| "INTERVAL"
+
+	// Aggregate Functions
+	| "COUNT"
+	| "SUM"
+	| "AVG"
+	| "MIN"
+	| "MAX"
+	| "ARRAY_AGG"
+	| "STRING_AGG"
+	| "BOOL_AND"
+	| "BOOL_OR"
+	| "STDDEV"
+	| "VARIANCE"
+
+	// JSON Functions
+	| "JSON_AGG"
+	| "JSON_BUILD_ARRAY"
+	| "JSON_BUILD_OBJECT"
+	| "JSON_OBJECT_AGG"
+	| "JSONB_SET"
+	| "JSONB_INSERT"
+	| "JSONB_PRETTY"
+	| "JSONB_ARRAY_LENGTH"
+	| "JSONB_EACH"
+	| "JSONB_EXISTS"
+
+	// Formatting Functions
+	| "TO_CHAR"
+	| "TO_DATE"
+	| "TO_NUMBER"
+	| "TO_TIMESTAMP";

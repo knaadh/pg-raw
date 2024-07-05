@@ -4,6 +4,7 @@ import {
 	connect,
 	escapeStringLiteral,
 	formatValue,
+	pgFn,
 	quoteIdentifier,
 } from "../lib/util";
 
@@ -257,5 +258,37 @@ describe("escapeStringLiteral", () => {
 		const input = "This is a it string with \\ and ' characters.";
 		const expected = "This is a it string with \\\\ and '' characters.";
 		expect(escapeStringLiteral(input)).toBe(expected); // Mixed text with backslash and single quote
+	});
+});
+
+describe("pgFn", () => {
+	it("formats the COUNT function correctly", () => {
+		const result = pgFn("COUNT", "id");
+		expect(result).toBe('COUNT("id")');
+	});
+
+	it("handles string literals and concatenation in CONCAT function", () => {
+		const result = pgFn("CONCAT", "'John'", "' ' ||", "'Doe'");
+		expect(result).toBe("CONCAT('John', ' ' ||, 'Doe')");
+	});
+
+	it("formats the SUM function with a column name", () => {
+		const result = pgFn("SUM", "revenue");
+		expect(result).toBe('SUM("revenue")');
+	});
+
+	it("handles numerical arguments correctly", () => {
+		const result = pgFn("ADD", 5, 10);
+		expect(result).toBe("ADD(5, 10)");
+	});
+
+	it("correctly identifies and formats multiple column names", () => {
+		const result = pgFn("MAX", "age", "salary");
+		expect(result).toBe('MAX("age", "salary")');
+	});
+
+	it("handles mixed arguments (column names and literals)", () => {
+		const result = pgFn("CONCAT", "firstName", "' '", "lastName");
+		expect(result).toBe('CONCAT("firstName", \' \', "lastName")');
 	});
 });

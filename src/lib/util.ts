@@ -1,4 +1,5 @@
 import { identifierRegex, valueRegex } from "./const";
+import type { PgFunction } from "./types";
 
 /**
  * Formats a value for use in a SQL query.
@@ -102,4 +103,35 @@ export function concat(table: string, column: string): string {
 	}
 
 	return `"${trimmedTable}"."${trimmedColumn}"`;
+}
+
+/**
+ * Generates a PostgreSQL function call string.
+ *
+ * @param functionName - The name of the PostgreSQL function.
+ * @param args - The arguments to pass to the PostgreSQL function, which can be strings (identifiers or literals) or numbers.
+ * @returns The formatted PostgreSQL function call string.
+ *
+ * @example
+ * // Returns: CONCAT("first_name", ' ', "last_name")
+ * pgFn("CONCAT", "first_name", "' '", "last_name");
+ */
+export function pgFn(
+	functionName: PgFunction | (string & {}),
+	...args: (string | number)[]
+): string {
+	const formattedArgs = args
+		.map((arg) => {
+			if (typeof arg === "string") {
+				// Check if arg is a column name or a string literal
+				if (arg.match(/^[a-z0-9_]+$/i)) {
+					return quoteIdentifier(arg);
+				}
+				return arg;
+			}
+			return arg.toString();
+		})
+		.join(", ");
+
+	return `${functionName}(${formattedArgs})`;
 }
