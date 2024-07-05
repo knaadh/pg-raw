@@ -18,4 +18,12 @@ describe("index", () => {
 	it("should export insertMany function", () => {
 		expect(index.insertMany).toBe(insertMany);
 	});
+
+	it("should export updateMany function", () => {
+		expect(index.updateMany).toBe(index.updateMany);
+	});
+
+	it("should export pgFn function", () => {
+		expect(index.pgFn).toBe(index.pgFn);
+	});
 });
