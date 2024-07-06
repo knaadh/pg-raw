@@ -1,9 +1,9 @@
 {
 	"name": "@knaadh/pg-raw",
-	"version": "1.0.0",
+	"version": "0.1.0",
 	"author": "Mithlesh Jasrotia <mithleshjs@gmail.com>",
 	"license": "MIT",
-	"description": "A raw query builder for Postgres",
+	"description": "A schemaless raw query builder for PostgreSQL",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/knaadh/pg-raw.git"
