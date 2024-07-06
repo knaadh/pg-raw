@@ -125,7 +125,14 @@ export type OrderBy = {
 export type GroupBy = Array<string>;
 
 export type WhereCondition = {
-	[key: string]: QueryFilter | string | boolean | number;
+	[key: string]:
+		| QueryFilter
+		| string
+		| boolean
+		| number
+		| {
+				[key: string]: string | number | boolean | null | SubQueryExpression;
+		  };
 };
 
 export type NestedWhereCondition = {

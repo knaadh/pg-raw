@@ -61,7 +61,7 @@ function handleFieldValueObject(
 				} else {
 					whereClauses.push(
 						`${quoteIdentifier(field)} ${
-							Operators[operator as keyof typeof Operators]
+							Operators[operator as keyof typeof Operators] ?? operator
 						} (${fieldValue.map(formatValue).join(", ")})`,
 					);
 				}
@@ -86,7 +86,7 @@ function handleFieldValueObject(
 				} else {
 					whereClauses.push(
 						`${quoteIdentifier(field)} ${
-							Operators[operator as keyof typeof Operators]
+							Operators[operator as keyof typeof Operators] ?? operator
 						} ${formatValue(fieldValue)}`,
 					);
 				}
@@ -102,7 +102,7 @@ function handleBetweenOperator(
 ) {
 	whereClauses.push(
 		`${quoteIdentifier(field)} ${
-			Operators[operator as keyof typeof Operators]
+			Operators[operator as keyof typeof Operators] ?? operator
 		} ${value.map((item: unknown) => formatValue(item)).join(" AND ")}`,
 	);
 	return;
@@ -152,7 +152,7 @@ function handleSomeAnySubQuery(
 		for (const [key, subquery] of Object.entries(queries)) {
 			conditions.push(
 				`${quoteIdentifier(field)} ${
-					Operators[operator as keyof typeof Operators]
+					Operators[operator as keyof typeof Operators] ?? operator
 				} ${whereSubQuery(
 					expression === "some" ? "SOME" : "ALL",
 					subquery as SubQuery,
@@ -175,7 +175,7 @@ function handleInSubquery(
 	for (const [key, subquery] of Object.entries(value)) {
 		whereClauses.push(
 			`${quoteIdentifier(field)} ${whereSubQuery(
-				Operators[operator as keyof typeof Operators],
+				Operators[operator as keyof typeof Operators] ?? operator,
 				subquery as SubQuery,
 				key,
 				relations,
