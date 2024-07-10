@@ -67,8 +67,8 @@ export type Include = {
 export type IncludeQuery = {
 	select: Select;
 	where?: QueryWhereCondition;
-	limit?: number;
-	offset?: number;
+	limit?: number | string;
+	offset?: number | string;
 	include?: Include;
 	groupBy?: string[];
 	having?: QueryHavingCondition;
@@ -156,8 +156,8 @@ export type SqlParams = {
 	update?: string;
 	join?: string | null;
 	where?: QueryWhereCondition;
-	limit?: number;
-	offset?: number;
+	limit?: number | string;
+	offset?: number | string;
 	groupBy?: GroupBy;
 	having?: QueryHavingCondition;
 	orderBy?: OrderBy;

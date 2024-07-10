@@ -69,6 +69,12 @@ describe("sql", () => {
 		expect(result).toBe("SELECT * FROM table LIMIT 10 OFFSET 5");
 	});
 
+	it("should handle placeholders in limit and offset", () => {
+		const params = { select: "SELECT * FROM table", limit: "$1", offset: "$2" };
+		const result = sql(params);
+		expect(result).toBe("SELECT * FROM table LIMIT $1 OFFSET $2");
+	});
+
 	it("should add returning clause", () => {
 		const params = { select: "SELECT * FROM table", returning: ["id", "name"] };
 		const result = sql(params);
