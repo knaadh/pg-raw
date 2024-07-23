@@ -1,9 +1,3 @@
-export type SingleKey<K extends string, V = unknown> = {
-	[P in K]: Record<P, V> & Partial<Record<Exclude<K, P>, never>> extends infer O
-		? { [Q in keyof O]: O[Q] }
-		: never;
-}[K];
-
 export enum Operators {
 	equals = "=",
 	notEquals = "<>",
@@ -21,9 +15,23 @@ export enum Operators {
 	notIn = "NOT IN",
 }
 
-export type SubQueryExpression = {
-	[key in "all" | "some"]?: Record<string, SubQuery>;
-};
+export type SubQueryExpression =
+	| {
+			all: {
+				[key: string]: SubQuery;
+			};
+			some?: {
+				[key: string]: SubQuery;
+			};
+	  }
+	| {
+			some: {
+				[key: string]: SubQuery;
+			};
+			all?: {
+				[key: string]: SubQuery;
+			};
+	  };
 
 export type QueryFilter = {
 	equals?: string | number | boolean | null | SubQueryExpression;
@@ -41,9 +49,16 @@ export type QueryFilter = {
 	is?: "NOT NULL" | "NULL";
 };
 
-export type Relations = {
+export type Relations<R extends string = never> = {
+	[P in R]: Relation;
+} & {
 	[key: string]: Relation;
 };
+
+export enum RelationType {
+	ONE = "ONE",
+	MANY = "MANY",
+}
 
 export type Relation = {
 	type?: "ONE" | "MANY";
@@ -60,89 +75,120 @@ export type Junction = {
 	referenceField: string;
 };
 
-export type Include = {
+export type Include<T = unknown, R extends string = "none"> = {
+	[K in keyof T as K extends R ? K : never]?: IncludeQuery<
+		ElementType<T[K]>,
+		R
+	>;
+} & {
 	[key: string]: IncludeQuery;
 };
 
-export type IncludeQuery = {
-	select: Select;
-	where?: QueryWhereCondition;
+export type IncludeQuery<T = unknown, R extends string = "none"> = {
+	select: Select<T, R>;
+	where?: QueryWhereCondition<T, R>;
 	limit?: number | string;
 	offset?: number | string;
-	include?: Include;
-	groupBy?: string[];
+	include?: Include<T, R>;
+	groupBy?: GroupBy<T>;
 	having?: QueryHavingCondition;
-	orderBy?: OrderBy;
-	leftJoin?: Join;
-	rightJoin?: Join;
-	innerJoin?: Join;
-	fullJoin?: Join;
+	orderBy?: OrderBy<T, R>;
+	leftJoin?: Join<T, R>;
+	rightJoin?: Join<T, R>;
+	innerJoin?: Join<T, R>;
+	fullJoin?: Join<T, R>;
 };
 
-export type FindManyParams = {
+export type IncludesNone<R extends string> = "none" extends R ? true : false;
+
+export type FindManyParams<T = unknown, R extends string = "none"> = {
 	table: string;
-	query: SelectQuery;
-	relations?: Relations;
-};
+	query: SelectQuery<T, Exclude<R, "none">>;
+} & (IncludesNone<R> extends true
+	? { relations?: Relations<Exclude<R, "none">> }
+	: { relations: Relations<R> });
 
-export type Select = {
+export type Select<T = unknown, R extends string = "none"> = {
+	[K in keyof T as Exclude<K, R>]?: boolean;
+} & {
 	[key: string]: string | boolean;
 };
 
-export type SelectQuery = {
-	select: Select;
-	where?: QueryWhereCondition;
+export type SelectQuery<T = unknown, R extends string = "none"> = {
+	select: Select<T, R>;
+	where?: QueryWhereCondition<T, R>;
 	limit?: number;
 	offset?: number;
-	include?: Include;
-	groupBy?: string[];
+	include?: Include<T, R>;
+	groupBy?: GroupBy<T>;
 	having?: QueryHavingCondition;
-	orderBy?: OrderBy;
-	leftJoin?: Join;
-	rightJoin?: Join;
-	innerJoin?: Join;
-	fullJoin?: Join;
+	orderBy?: OrderBy<T, R>;
+	leftJoin?: Join<T, R>;
+	rightJoin?: Join<T, R>;
+	innerJoin?: Join<T, R>;
+	fullJoin?: Join<T, R>;
 };
 
-export type Join<T = never> = {
+export type ElementType<T> = T extends (infer U)[] ? U : T;
+
+export type Join<T, R extends string> = {
+	[K in keyof T as K extends R ? K : never]?: Omit<
+		SelectQuery<ElementType<T[K]>, R>,
+		"include" | "leftJoin" | "rightJoin" | "innerJoin" | "fullJoin"
+	>;
+} & {
 	[key: string]: Omit<
 		SelectQuery,
-		| "include"
-		| "leftJoin"
-		| "rightJoin"
-		| "innerJoin"
-		| "fullJoin"
-		| (T extends string ? T : never)
+		"include" | "leftJoin" | "rightJoin" | "innerJoin" | "fullJoin"
 	>;
 };
 
-export type SubQuery = Omit<SelectQuery, "include"> & { table?: string };
+export type SubQuery<T = unknown, R extends string = "none"> = Omit<
+	SelectQuery<T, R>,
+	"include"
+> & { table?: string };
 
-export type OrderBy = {
-	[key: string]: "ASC" | "DESC";
+export enum Order {
+	ASC = "ASC",
+	DESC = "DESC",
+}
+
+export type OrderDirection = "ASC" | "DESC";
+
+export type OrderBy<T = unknown, R extends string = "none"> = {
+	[K in keyof T as Exclude<K, R>]?: OrderDirection;
+} & {
+	[key: string]: OrderDirection;
 };
 
-export type GroupBy = Array<string>;
+export type GroupBy<T = unknown> = (keyof T)[] | string[];
 
-export type WhereCondition = {
+export type WhereCondition<T = unknown, R extends string = "none"> = {
+	[K in keyof T as Exclude<K, R>]?:
+		| QueryFilter
+		| string
+		| boolean
+		| number
+		| Record<string, string | boolean | number>;
+} & {
 	[key: string]:
 		| QueryFilter
 		| string
 		| boolean
 		| number
-		| {
-				[key: string]: string | number | boolean | null | SubQueryExpression;
-		  };
+		| Record<string, string | boolean | number>;
 };
 
-export type NestedWhereCondition = {
-	OR?: QueryWhereCondition[];
-	NOT?: QueryWhereCondition;
-	AND?: QueryWhereCondition[];
+export type NestedWhereCondition<T = unknown, R extends string = "none"> = {
+	OR?: QueryWhereCondition<T, R>[];
+	NOT?: QueryWhereCondition<T, R>;
+	AND?: QueryWhereCondition<T, R>[];
 	exists?: Record<string, Omit<SubQuery, "select"> | true>;
 };
 
-export type QueryWhereCondition = WhereCondition | NestedWhereCondition;
+export type QueryWhereCondition<T = unknown, R extends string = "none"> =
+	| WhereCondition<T, R>
+	| NestedWhereCondition<T, R>;
 
 export type QueryHavingCondition =
 	| WhereCondition
@@ -165,39 +211,43 @@ export type SqlParams = {
 	returning?: Array<string>;
 };
 
-export type InsertOneParams = {
+export type InsertOneParams<T = unknown> = {
 	table: string;
-	data: Record<string, string | number | boolean | object | null | undefined>;
-	returning?: string[];
+	data: T &
+		Record<string, string | number | boolean | object | null | undefined>;
+	returning?: (keyof T)[] | string[];
 };
 
-export type InsertManyParams = {
+export type InsertManyParams<T = unknown> = {
 	table: string;
-	data: Array<string | number | boolean | object>;
-	returning?: string[];
+	data: Array<T>;
+	returning?: (keyof T)[] | string[];
 };
 
-export type UpdateManyParams = {
+export type UpdateManyParams<T = unknown, R extends string = "none"> = {
 	table: string;
-	query: UpdateQuery;
-	relations?: Relations;
+	query: UpdateQuery<T, R>;
+} & (IncludesNone<R> extends true
+	? { relations?: Relations<Exclude<R, "none">> }
+	: { relations: Relations<R> });
+
+export type UpdateQuery<T = unknown, R extends string = "none"> = {
+	data: Partial<T> &
+		Record<string, string | number | boolean | object | null | undefined>;
+	where?: QueryWhereCondition<T, R>;
+	returning?: (keyof T)[] | string[];
 };
 
-export type UpdateQuery = {
-	data: Record<string, string | number | boolean | object | null | undefined>;
-	where?: QueryWhereCondition;
-	returning?: string[];
-};
-
-export type DeleteManyParams = {
+export type DeleteManyParams<T = unknown, R extends string = "none"> = {
 	table: string;
-	query?: DeleteQuery;
-	relations?: Relations;
-};
+	query?: DeleteQuery<T, R>;
+} & (IncludesNone<R> extends true
+	? { relations?: Relations<Exclude<R, "none">> }
+	: { relations: Relations<R> });
 
-export type DeleteQuery = {
-	where?: QueryWhereCondition;
-	returning?: string[];
+export type DeleteQuery<T = unknown, R extends string = "none"> = {
+	where?: QueryWhereCondition<T, R>;
+	returning?: (keyof T)[] | string[];
 };
 
 export type PgFunction =

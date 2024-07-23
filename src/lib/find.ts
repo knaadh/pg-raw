@@ -1,7 +1,13 @@
 import { buildSelectQuery } from "./build";
 import type { FindManyParams } from "./types";
 
-export function findMany(params: FindManyParams): string {
+export function findMany(params: FindManyParams): string;
+export function findMany<T, R extends string = "none">(
+	params: FindManyParams<T, R>,
+): string;
+export function findMany<T = unknown, R extends string = "none">(
+	params: FindManyParams<T, R>,
+): string {
 	const { table, query, relations = {} } = params;
-	return buildSelectQuery(table, query, relations, false);
+	return buildSelectQuery<T, R>(table, query, relations, false);
 }

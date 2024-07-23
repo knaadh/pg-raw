@@ -1,7 +1,13 @@
 import { buildUpdateQuery } from "./build";
 import type { UpdateManyParams } from "./types";
 
-export function updateMany(params: UpdateManyParams): string {
+export function updateMany(params: UpdateManyParams): string;
+export function updateMany<T, R extends string = "none">(
+	params: UpdateManyParams<T, R>,
+): string;
+export function updateMany<T = unknown, R extends string = "none">(
+	params: UpdateManyParams<T, R>,
+): string {
 	const { table, query, relations = {} } = params;
 
 	if (!table || typeof table !== "string" || !table.trim()) {
