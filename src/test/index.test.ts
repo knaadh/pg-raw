@@ -26,4 +26,8 @@ describe("index", () => {
 	it("should export pgFn function", () => {
 		expect(index.pgFn).toBe(index.pgFn);
 	});
+
+	it("should export raw function", () => {
+		expect(index.raw).toBe(index.raw);
+	});
 });
