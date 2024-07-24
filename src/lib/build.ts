@@ -7,6 +7,7 @@ import type {
 	IncludeQuery,
 	Relation,
 	Relations,
+	Select,
 	SelectQuery,
 	SqlParams,
 	UpdateQuery,
@@ -14,9 +15,9 @@ import type {
 import { connect, formatValue, quoteIdentifier } from "./util";
 import { where } from "./where";
 
-export function buildSelectQuery(
+export function buildSelectQuery<T = unknown, R extends string = "none">(
 	key: string,
-	query: SelectQuery | IncludeQuery,
+	query: SelectQuery<T, R> | IncludeQuery<T, R>,
 	relations: Relations,
 	isNested = false,
 	append?: {
@@ -24,7 +25,7 @@ export function buildSelectQuery(
 		join?: string;
 	},
 ): string {
-	const columns = {
+	const columns: Select = {
 		...(query.select || {}),
 	};
 	// Directly mutate columns to include all keys from query.include
@@ -36,7 +37,7 @@ export function buildSelectQuery(
 	const args: SqlParams = {
 		select: "",
 		where: query.where,
-		groupBy: query.groupBy,
+		groupBy: query.groupBy as never,
 		having: query.having,
 		orderBy: query.orderBy,
 		limit: query.limit,
@@ -160,15 +161,15 @@ export function buildSelectQuery(
 	return sql(args, append);
 }
 
-export function buildDeleteQuery(
+export function buildDeleteQuery<T = unknown, R extends string = "none">(
 	table: string,
-	query?: DeleteQuery,
+	query?: DeleteQuery<T, R>,
 	relations?: Relations,
 ) {
 	const args: SqlParams = {
 		delete: `DELETE FROM ${quoteIdentifier(table)}`,
 		where: query?.where || {},
-		returning: query?.returning || [],
+		returning: (query?.returning || []) as never,
 		relations: relations,
 		join: "",
 	};
@@ -176,15 +177,15 @@ export function buildDeleteQuery(
 	return sql(args);
 }
 
-export function buildUpdateQuery(
+export function buildUpdateQuery<T = unknown, R extends string = "none">(
 	table: string,
-	query: UpdateQuery,
+	query: UpdateQuery<T, R>,
 	relations?: Relations,
 ) {
 	const args: SqlParams = {
-		update: `UPDATE ${quoteIdentifier(table)} SET ${buildUpdateValues(query.data)}`,
+		update: `UPDATE ${quoteIdentifier(table)} SET ${buildUpdateValues(query.data as never)}`,
 		where: query?.where || {},
-		returning: query?.returning || [],
+		returning: (query?.returning || []) as never,
 		relations: relations,
 	};
 

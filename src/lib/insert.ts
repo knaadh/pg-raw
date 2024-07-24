@@ -2,7 +2,9 @@ import { buildColumns, buildValues } from "./build";
 import type { InsertManyParams, InsertOneParams } from "./types";
 import { quoteIdentifier } from "./util";
 
-export function insertOne(params: InsertOneParams): string {
+export function insertOne(params: InsertOneParams): string;
+export function insertOne<T>(params: InsertOneParams<T>): string;
+export function insertOne<T = unknown>(params: InsertOneParams<T>): string {
 	const { table, data, returning = [] } = params;
 
 	if (!table || table.trim() === "") {
@@ -27,7 +29,9 @@ export function insertOne(params: InsertOneParams): string {
 	)} (${columns}) VALUES (${values})${_returning}`;
 }
 
-export function insertMany(params: InsertManyParams): string {
+export function insertMany(params: InsertManyParams): string;
+export function insertMany<T>(params: InsertManyParams<T>): string;
+export function insertMany<T = unknown>(params: InsertManyParams<T>): string {
 	const { table, data, returning = [] } = params;
 
 	if (!table || table.trim() === "") {
@@ -38,9 +42,9 @@ export function insertMany(params: InsertManyParams): string {
 		throw new Error("Data must be a non-empty array");
 	}
 
-	const columns = buildColumns(Object.keys(data[0]));
+	const columns = buildColumns(Object.keys(data[0] as never));
 	const values = data
-		.map((row) => `(${buildValues(Object.values(row))})`)
+		.map((row) => `(${buildValues(Object.values(row as never))})`)
 		.join(", ");
 	const _returning =
 		returning.length > 0 ? ` RETURNING ${buildColumns(returning)}` : "";
