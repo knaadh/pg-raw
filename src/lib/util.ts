@@ -23,6 +23,11 @@ export function formatValue(value: unknown): unknown {
 			)
 			.join(", ")})`;
 	}
+
+	if (typeof value === "string" && value.startsWith("RAW_FLAG:")) {
+		return value.replace("RAW_FLAG:", "");
+	}
+
 	return typeof value === "string" && !valueRegex.test(value)
 		? `'${escapeStringLiteral(value)}'`
 		: value;
@@ -134,4 +139,36 @@ export function pgFn(
 		.join(", ");
 
 	return `${functionName}(${formattedArgs})`;
+}
+
+/**
+ * Constructs a raw SQL query string from template literals.
+ *
+ * This function takes a template literal and its values, and constructs a raw SQL query string.
+ * It adds a `RAW_FLAG:` prefix to indicate that the resulting string is a raw SQL query.
+ *
+ * @param {TemplateStringsArray} strings - The template strings array.
+ * @param {...unknown} values - The values to be interpolated into the template strings.
+ * @returns {string} The constructed raw SQL query string prefixed with `RAW_FLAG:`.
+ *
+ * @example
+ * const params: FindManyParams = {
+ *  table: "employee",
+ *  query: {
+ *      select: {
+ *          id: true,
+ *          first_name: true,
+ *          last_name: true,
+ *      },
+ *      where: {
+ *          id: {
+ *              IN: raw`(SELECT id from users WHERE type = 'employee')`,
+ *          },
+ *      },
+ *      limit: 10,
+ *  },
+ * };
+ */
+export function raw(strings: TemplateStringsArray, ...values: unknown[]) {
+	return `RAW_FLAG:${strings.reduce((acc, str, i) => acc + str + (values[i] || ""), "")}`;
 }

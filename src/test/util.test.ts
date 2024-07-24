@@ -6,6 +6,7 @@ import {
 	formatValue,
 	pgFn,
 	quoteIdentifier,
+	raw,
 } from "../lib/util";
 
 describe("formatValue", () => {
@@ -290,5 +291,28 @@ describe("pgFn", () => {
 	it("handles mixed arguments (column names and literals)", () => {
 		const result = pgFn("CONCAT", "firstName", "' '", "lastName");
 		expect(result).toBe('CONCAT("firstName", \' \', "lastName")');
+	});
+});
+
+describe("raw", () => {
+	it("should return a raw SQL string with interpolated values", () => {
+		const type = "admin";
+		const result = raw`SELECT * FROM users WHERE type = ${type}`;
+		expect(result).toBe("RAW_FLAG:SELECT * FROM users WHERE type = admin");
+	});
+
+	it("should handle multiple values", () => {
+		const result = raw`SELECT * FROM users WHERE id IN (${1}, ${2}, ${3})`;
+		expect(result).toBe("RAW_FLAG:SELECT * FROM users WHERE id IN (1, 2, 3)");
+	});
+
+	it("should handle empty values", () => {
+		const result = raw`SELECT * FROM users WHERE id = ${undefined}`;
+		expect(result).toBe("RAW_FLAG:SELECT * FROM users WHERE id = ");
+	});
+
+	it("should handle no values", () => {
+		const result = raw`SELECT * FROM users`;
+		expect(result).toBe("RAW_FLAG:SELECT * FROM users");
 	});
 });
