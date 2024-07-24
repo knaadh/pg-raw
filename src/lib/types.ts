@@ -91,21 +91,26 @@ export type NestedWhereCondition<T = unknown, R extends string = "none"> = {
 	exists?: Record<string, Omit<SubQuery, "select"> | true>;
 };
 
-export type QueryFilter = {
-	equals?: string | number | boolean | null | SubQueryExpression;
-	notEquals?: string | number | boolean | null | SubQueryExpression;
-	lessThan?: string | number | Date | null | SubQueryExpression;
-	greaterThan?: string | number | Date | null | SubQueryExpression;
-	lessThanOrEqual?: string | number | Date | null | SubQueryExpression;
-	greaterThanOrEqual?: string | number | Date | null | SubQueryExpression;
-	like?: string;
-	iLike?: string;
-	in?: (string | number | boolean | null)[] | Record<string, SubQuery>;
-	notIn?: (string | number | boolean | null)[] | Record<string, SubQuery>;
-	between?: [string | number | Date | null, string | number | Date | null];
-	notBetween?: [string | number | Date | null, string | number | Date | null];
-	is?: "NOT NULL" | "NULL";
-} & Record<string, string | boolean | number>;
+export type QueryFilter =
+	| {
+			equals?: string | number | boolean | null | SubQueryExpression;
+			notEquals?: string | number | boolean | null | SubQueryExpression;
+			lessThan?: string | number | Date | null | SubQueryExpression;
+			greaterThan?: string | number | Date | null | SubQueryExpression;
+			lessThanOrEqual?: string | number | Date | null | SubQueryExpression;
+			greaterThanOrEqual?: string | number | Date | null | SubQueryExpression;
+			like?: string;
+			iLike?: string;
+			in?: (string | number | boolean | null)[] | Record<string, SubQuery>;
+			notIn?: (string | number | boolean | null)[] | Record<string, SubQuery>;
+			between?: [string | number | Date | null, string | number | Date | null];
+			notBetween?: [
+				string | number | Date | null,
+				string | number | Date | null,
+			];
+			is?: "NOT NULL" | "NULL";
+	  }
+	| Record<string, string | boolean | number>;
 
 export type SubQueryExpression =
 	| {
