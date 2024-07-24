@@ -79,19 +79,9 @@ export type QueryWhereCondition<T = unknown, R extends string = "none"> =
 	| NestedWhereCondition<T, R>;
 
 export type WhereCondition<T = unknown, R extends string = "none"> = {
-	[K in keyof T as Exclude<K, R>]?:
-		| QueryFilter
-		| string
-		| boolean
-		| number
-		| Record<string, string | boolean | number>;
+	[K in keyof T as Exclude<K, R>]?: QueryFilter | string | boolean | number;
 } & {
-	[key: string]:
-		| QueryFilter
-		| string
-		| boolean
-		| number
-		| Record<string, string | boolean | number>;
+	[key: string]: QueryFilter | string | boolean | number;
 };
 
 export type NestedWhereCondition<T = unknown, R extends string = "none"> = {
@@ -115,7 +105,7 @@ export type QueryFilter = {
 	between?: [string | number | Date | null, string | number | Date | null];
 	notBetween?: [string | number | Date | null, string | number | Date | null];
 	is?: "NOT NULL" | "NULL";
-};
+} & Record<string, string | boolean | number>;
 
 export type SubQueryExpression =
 	| {
