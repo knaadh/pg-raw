@@ -37,11 +37,12 @@ bun add @knaadh/pg-raw
 
 ## Usage
 
-Here's a basic example of how to use pg-raw
+Here’s a simple example showing how to use the pg-raw library:
 
 ```typescript
 import { findMany, FindManyParams } from '@knaadh/pg-raw';
 
+// Basic usage example
 const params: FindManyParams = {
   table: 'users',
   query: {
@@ -60,7 +61,75 @@ console.log(findMany(params));
 // Output: SELECT "id", "name" FROM "users" WHERE "email" = 'admin@gmail.com' LIMIT 1
 ```
 
-This example demonstrates how to construct a query to find a user by their email address, selecting only their id and name, and limiting the result to one row.
+Additionally, you can also define types to ensure code completion and partial type safety
+
+```typescript
+import { findMany, FindManyParams } from '@knaadh/pg-raw';
+
+interface User {
+  id: number;
+  name: string;
+  email: string;
+}
+
+const params: FindManyParams<User> = {
+  table: 'users',
+  query: {
+    select: {
+      id: true,
+      name: true,
+    },
+    where: {
+      email: 'admin@gmail.com',
+    },
+    limit: 1,
+  },
+};
+
+console.log(findMany(params));
+// Output: SELECT "id", "name" FROM "users" WHERE "email" = 'admin@gmail.com' LIMIT 1
+```
+
+The examples demonstrate how to construct a query to find a user by their email address, selecting only their id and name, and limiting the result to one row. The first example does not use types, while the second example utilizes types for added code completion and partial type safety.
+
+### Executing Generated Queries
+
+To execute the generated queries, you can use any Postgres client such as [node-postgres](https://node-postgres.com/), [postgres.js](https://github.com/porsager/postgres), or ORMs like [Prisma](https://www.prisma.io/) that support raw queries.
+
+Here's an example using [node-postgres](https://node-postgres.com/):
+
+```typescript
+
+import { findMany, type FindManyParams } from "@knaadh/pg-raw";
+import { Client } from "pg";
+
+const client = new Client({
+	connectionString: process.env.DATABASE_URL,
+});
+await client.connect();
+
+const params: FindManyParams = {
+	table: "employee",
+	query: {
+		select: {
+			id: true,
+			first_name: true,
+			last_name: true,
+		},
+		where: {
+			gender: "$1",
+		},
+		limit: 10,
+	},
+};
+
+const employeesQuery = findMany(params);
+
+const data = await client.query(employeesQuery, ["F"]);
+
+console.log(data.rows);
+
+```
 
 ## Features
 
