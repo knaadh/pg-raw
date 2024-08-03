@@ -1,7 +1,13 @@
 
-![pgRaw](https://github.com/knaadh/pg-raw/assets/16979444/baa9d8e3-9a6a-400b-a4f8-540d3b4dd9bb)
+![pg-header](https://github.com/user-attachments/assets/cf9cf608-42b4-45d8-8e87-5cbf079d85c6)
 
-# Pg-Raw
+# Pg-Raw 
+
+![NPM Version](https://img.shields.io/npm/v/%40knaadh%2Fpg-raw)
+![Codecov](https://img.shields.io/codecov/c/github/knaadh/pg-raw)
+![CodeFactor Grade](https://img.shields.io/codefactor/grade/github/knaadh/pg-raw)
+![GitHub branch status](https://img.shields.io/github/checks-status/knaadh/pg-raw/main)
+
 A modern library for easily generating PostgreSQL raw queries through a clean and simple API.
 
 This isn't an ORM or query executor - it focuses solely on generating SQL strings, allowing you to execute these queries using Knex, Drizzle, Prisma, or your preferred PostgreSQL client or tool.
@@ -137,7 +143,7 @@ console.log(data.rows);
 - Supports generation of SELECT, INSERT, UPDATE, and DELETE queries
 - Flexible query building with support for complex conditions and joins
 - Automatically generates SQL queries to fetch and aggregate relational data into a single column
-- Compatible with any PostgreSQL client or ORM for query execution
+- Compatible with all PostgreSQL clients such as [node-postgres](https://node-postgres.com/), [postgres.js](https://github.com/porsager/postgres) or ORMs that support raw queries such as [Drizzle](https://orm.drizzle.team/), [Prisma](https://www.prisma.io/).
 
 ## API
 This section provides detailed documentation for each API method available in the pg-raw library. These methods allow you to construct SQL queries for interacting with PostgreSQL databases.
