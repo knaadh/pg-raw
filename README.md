@@ -115,17 +115,17 @@ const client = new Client({
 await client.connect();
 
 const params: FindManyParams = {
-	table: "employee",
-	query: {
-		select: {
-			id: true,
-			first_name: true,
-			last_name: true,
-		},
-		where: {
-			gender: "$1",
-		},
-		limit: 10,
+  table: "employee",
+  query: {
+    select: {
+      id: true,
+      first_name: true,
+      last_name: true,
+    },
+    where: {
+      gender: "$1",
+    },
+    limit: 10,
 	},
 };
 
@@ -187,9 +187,11 @@ findMany(params: FindManyParams): string
         };
         console.log(findMany(params));
         // Output: SELECT "id", "name" FROM "public"."users"
+      ```
 - `query` (SelectQuery): Specifications for the SELECT query, including what data to select, conditions, ordering, and limits.
    - `select` (Select): Specifies which columns and SQL functions to include in the results. Each key in the object can be a column name or an alias for the column, function or expression.
      - **Basic Example:**
+
         ```typescript
           const params: FindManyParams = {
               table: 'users',
@@ -202,6 +204,7 @@ findMany(params: FindManyParams): string
         ```
       
       - **Alias Example:**
+
         ```typescript
           const params: FindManyParams = {
               table: 'users',
@@ -214,6 +217,7 @@ findMany(params: FindManyParams): string
         ```
       
       - **Function Example:**
+
         ```typescript
           const params: FindManyParams = {
               table: 'users',
@@ -234,6 +238,7 @@ findMany(params: FindManyParams): string
         ```
     - `where` (QueryWhereCondition): Defines conditions for filtering the records. Supports simple conditions, complex expressions, and logical grouping.
       - **Basic Example:**
+
         ```typescript
           const params: FindManyParams = {
             table: "users",
@@ -249,6 +254,7 @@ findMany(params: FindManyParams): string
         ```
       
       - **Complex Example:**
+
         ```typescript
           const params: FindManyParams = {
             table: "users",
@@ -268,6 +274,7 @@ findMany(params: FindManyParams): string
           // Output: SELECT "id", "name" FROM "users" WHERE ("status" = 'active' AND ("type" = 'admin' OR "type" = 'user'))
         ```
     - `limit` (number): Specifies the maximum number of records to return in the query results. This is useful for pagination or limiting data retrieval to a manageable size.
+
       ```typescript
         const params: FindManyParams = {
           table: "users",
@@ -280,6 +287,7 @@ findMany(params: FindManyParams): string
         // Output: SELECT "id", "name" FROM "users" LIMIT 10
       ```
     - `offset` (number): Specifies the number of records to skip before starting to count the limit of returned records. This is often used in conjunction with limit for implementing pagination.
+
       ```typescript
         const params: FindManyParams = {
           table: "users",
@@ -292,6 +300,7 @@ findMany(params: FindManyParams): string
         // Output: SELECT "id", "name" FROM "users" OFFSET 10
       ```
     - `orderBy` (OrderBy): Specifies the ordering of the results based on one or more columns. The object should have column names as keys and the order direction (`ASC` or `DESC`) as values.
+
       ```typescript
         const params: FindManyParams = {
           table: "users",
@@ -306,6 +315,7 @@ findMany(params: FindManyParams): string
         // Output: SELECT "id", "name" FROM "users" ORDER BY "id" DESC
       ```
     - `groupBy` (string[]): Specifies the columns by which the results should be grouped. Useful for aggregation queries where you want to summarize or categorize data.
+
       ```typescript
         const params: FindManyParams = {
           table: "users",
@@ -318,6 +328,7 @@ findMany(params: FindManyParams): string
         // Output: SELECT COUNT(id) AS "total_users", "gender" FROM "users" GROUP BY "gender"
       ```
     - `having` (QueryHavingCondition): Specifies conditions for filtering the results of the query based on the aggregated data.
+    
       ```typescript
         const params: FindManyParams = {
           table: "sales",
@@ -336,6 +347,7 @@ findMany(params: FindManyParams): string
       ```
     - `include` (Include): Specifies related entities to include in the query results. Each key corresponds to a relation defined in the relations parameter, enabling the inclusion of complex and nested data from related tables. The include parameter automates the aggregation of related data into a single column, simplifying the retrieval of structured data that would typically require complex joins and groupings.
       - **Basic Example (One-to-One):**
+        
         ```typescript
           const params: FindManyParams = {
             table: "users",
@@ -371,6 +383,7 @@ findMany(params: FindManyParams): string
         ```
         
       - **Basic Example (One-To-Many):**
+        
         ```typescript
           const params: FindManyParams = {
             table: "artist",
@@ -418,6 +431,7 @@ findMany(params: FindManyParams): string
         ```
         
       - **Advance Example (Many-To-Many):**
+        
         ```typescript
           const params: FindManyParams = {
             table: "artist",
@@ -478,6 +492,7 @@ findMany(params: FindManyParams): string
         ```
         
     - `leftJoin` (Join): Builds a left outer join to fetch data from related tables. Ensures that all records from the primary table are included in the results, even if there are no corresponding entries in the joined table. The relationships necessary for using leftJoin must be predefined in the relations parameter, detailing how tables are linked and which fields connect them.
+      
       ```typescript
       const params: FindManyParams = {
         table: "artist",
@@ -511,8 +526,8 @@ findMany(params: FindManyParams): string
     - `fullJoin` (Join): Constructs a full outer join, combining the results of both leftJoin and rightJoin. It includes all records from both the primary and related tables, regardless of matching entries. Configure similarly to leftJoin.
   
 - `relations` (Relations): Defines how tables are related to each other for SQL joins within queries. Each key in the relations object represents a named relationship, and it is typically used to reference these relationships in the `include`, `leftJoin`, `rightJoin`, `innerJoin`, and `fullJoin` parameters of the query.
-   - `Relation` (Relation):
-       - `type` ("ONE" | "MANY"): Optional. Specifies whether the join should fetch data as a single JSON object (ONE) or as an aggregated JSON array (MANY), relevant only in `include` query.
+    - `Relation` (Relation):
+      - `type` ("ONE" | "MANY"): Optional. Specifies whether the join should fetch data as a single JSON object (ONE) or as an aggregated JSON array (MANY), relevant only in `include` query.
       - `table` (string): Refers to the table associated with the `key` in the relations object.
       - `field` (string): Refers to the column of the table (`table`) used for join.
       - `referenceTable` (string): The table from which the relation is called, typically the main table being queried.
@@ -523,6 +538,7 @@ findMany(params: FindManyParams): string
         - referenceField (string): The column in the junction table that links to the foreign key column in the `referenceTable`.
   
     - **Example:**
+      
       ```typescript
       const params: FindManyParams = {
         table: "artist",
@@ -571,6 +587,7 @@ insertOne(params: InsertOneParams): string
   - `returning` (array of string): An optional array of column names to be returned after the record is inserted. Useful for retrieving specific fields such as auto-generated IDs or default values.
 
   **Example:**
+    
     ```typescript
     const params: InsertOneParams = {
       table: "users",
@@ -603,6 +620,7 @@ insertMany(params: InsertManyParams): string
   - `returning` (array of string): An optional array of column names to be returned after the record is inserted. Useful for retrieving specific fields such as auto-generated IDs or default values.
 
   **Example:**
+    
     ```typescript
     const params: InsertManyParams = {
       table: "users",
@@ -636,6 +654,7 @@ updateMany(params: UpdateManyParams): string
     - `returning` (array of string, optional): An optional array of column names to be returned from the updated records. This is often used to retrieve specific fields to confirm the updates or for further processing.
 
   **Example:**
+    
     ```typescript
     const params: UpdateManyParams = {
       table: "users",
