@@ -172,3 +172,57 @@ export function pgFn(
 export function raw(strings: TemplateStringsArray, ...values: unknown[]) {
 	return `RAW_FLAG:${strings.reduce((acc, str, i) => acc + str + (values[i] || ""), "")}`;
 }
+
+/**
+ * Binds named parameters to a SQL query, converting them to PostgreSQL's numbered placeholder format.
+ *
+ * This function transforms SQL queries that use `:paramName` style named placeholders
+ * into PostgreSQL's numbered `$1, $2, ...` placeholder format, while collecting the
+ * corresponding parameter values.
+ *
+ * @param sqlQuery - The original SQL query string containing named placeholders
+ * @param paramValues - An object mapping placeholder names to their corresponding values
+ * @returns An object with the modified query text and an ordered array of parameter values
+ * @throws {Error} If the query is empty or a placeholder is missing a corresponding value
+ *
+ * @example
+ * const result = bindParams(
+ *   'SELECT * FROM users WHERE name = :userName AND age > :minAge',
+ *   { userName: 'John', minAge: 25 }
+ * );
+ * // Returns: {
+ * //   text: 'SELECT * FROM users WHERE name = $1 AND age > $2',
+ * //   values: ['John', 25]
+ * // }
+ */
+export function bindParams(
+	sqlQuery: string,
+	paramValues: Record<string, string | number | boolean | Date | null>,
+): {
+	text: string;
+	values: (string | number | boolean | Date | null)[];
+} {
+	if (!sqlQuery) {
+		throw new Error("Query text cannot be empty");
+	}
+
+	const values: (string | number | boolean | Date | null)[] = [];
+	let parameterIndex = 0;
+
+	// Replace named placeholders with PostgreSQL-style numbered placeholders
+	const parametrizedQueryText = sqlQuery.replace(
+		/:[a-zA-Z]\w*/g,
+		(placeholder) => {
+			const paramName = placeholder.slice(1);
+
+			if (!(paramName in paramValues)) {
+				throw new Error(`Missing value for placeholder: ${placeholder}`);
+			}
+
+			values.push(paramValues[paramName]);
+			return `$${++parameterIndex}`;
+		},
+	);
+
+	return { text: parametrizedQueryText, values };
+}
