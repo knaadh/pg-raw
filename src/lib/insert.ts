@@ -1,10 +1,14 @@
-import { buildColumns, buildValues } from "./build";
+import { buildColumns, buildConflictUpdateQuery, buildValues } from "./build";
 import type { InsertManyParams, InsertOneParams } from "./types";
 import { quoteIdentifier } from "./util";
 
 export function insertOne(params: InsertOneParams): string;
-export function insertOne<T>(params: InsertOneParams<T>): string;
-export function insertOne<T = unknown>(params: InsertOneParams<T>): string {
+export function insertOne<T, R extends string = "none">(
+	params: InsertOneParams<T, R>,
+): string;
+export function insertOne<T = unknown, R extends string = "none">(
+	params: InsertOneParams<T, R>,
+): string {
 	const { table, data, returning = [] } = params;
 
 	if (!table || table.trim() === "") {
@@ -22,16 +26,36 @@ export function insertOne<T = unknown>(params: InsertOneParams<T>): string {
 
 	const columns = buildColumns(Object.keys(data));
 	const values = buildValues(Object.values(data));
+	const conflicts = params.onConflict
+		? (() => {
+				if ("columns" in params.onConflict) {
+					return ` ON CONFLICT (${buildColumns(params.onConflict.columns)}) ${
+						params.onConflict.action.type === "DO NOTHING"
+							? "DO NOTHING"
+							: `${buildConflictUpdateQuery(params.onConflict.action, params.relations)}`
+					}`;
+				}
+				return ` ON CONFLICT ON CONSTRAINT ${quoteIdentifier(params.onConflict.constraint)} ${
+					params.onConflict.action.type === "DO NOTHING"
+						? "DO NOTHING"
+						: `${buildConflictUpdateQuery(params.onConflict.action, params.relations)}`
+				}`;
+			})()
+		: "";
 	const _returning =
 		returning.length > 0 ? ` RETURNING ${buildColumns(returning)}` : "";
 	return `INSERT INTO ${quoteIdentifier(
 		table,
-	)} (${columns}) VALUES (${values})${_returning}`;
+	)} (${columns}) VALUES (${values})${conflicts}${_returning}`;
 }
 
 export function insertMany(params: InsertManyParams): string;
-export function insertMany<T>(params: InsertManyParams<T>): string;
-export function insertMany<T = unknown>(params: InsertManyParams<T>): string {
+export function insertMany<T, R extends string = "none">(
+	params: InsertManyParams<T, R>,
+): string;
+export function insertMany<T = unknown, R extends string = "none">(
+	params: InsertManyParams<T, R>,
+): string {
 	const { table, data, returning = [] } = params;
 
 	if (!table || table.trim() === "") {
@@ -46,9 +70,25 @@ export function insertMany<T = unknown>(params: InsertManyParams<T>): string {
 	const values = data
 		.map((row) => `(${buildValues(Object.values(row as never))})`)
 		.join(", ");
+	const conflicts = params.onConflict
+		? (() => {
+				if ("columns" in params.onConflict) {
+					return ` ON CONFLICT (${buildColumns(params.onConflict.columns)}) ${
+						params.onConflict.action.type === "DO NOTHING"
+							? "DO NOTHING"
+							: `${buildConflictUpdateQuery(params.onConflict.action, params.relations)}`
+					}`;
+				}
+				return ` ON CONFLICT ON CONSTRAINT ${quoteIdentifier(params.onConflict.constraint)} ${
+					params.onConflict.action.type === "DO NOTHING"
+						? "DO NOTHING"
+						: `${buildConflictUpdateQuery(params.onConflict.action, params.relations)}`
+				}`;
+			})()
+		: "";
 	const _returning =
 		returning.length > 0 ? ` RETURNING ${buildColumns(returning)}` : "";
 	return `INSERT INTO ${quoteIdentifier(
 		table,
-	)} (${columns}) VALUES ${values}${_returning}`;
+	)} (${columns}) VALUES ${values}${conflicts}${_returning}`;
 }

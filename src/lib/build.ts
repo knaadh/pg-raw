@@ -192,6 +192,20 @@ export function buildUpdateQuery<T = unknown, R extends string = "none">(
 	return sql(args);
 }
 
+export function buildConflictUpdateQuery<
+	T = unknown,
+	R extends string = "none",
+>(query: UpdateQuery<T, R>, relations?: Relations) {
+	const args: SqlParams = {
+		update: `DO UPDATE SET ${buildUpdateValues(query.data as never)}`,
+		where: query?.where || {},
+		returning: (query?.returning || []) as never,
+		relations: relations,
+	};
+
+	return sql(args);
+}
+
 export function sql(
 	params: SqlParams,
 	append?: {

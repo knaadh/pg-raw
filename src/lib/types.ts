@@ -206,18 +206,49 @@ export type Junction = {
 	referenceField: string;
 };
 
-export type InsertOneParams<T = unknown> = {
+export type OnConflictAction<T = unknown, R extends string = "none"> =
+	| { type: "DO NOTHING" }
+	| {
+			type: "DO UPDATE";
+			data: Partial<T> &
+				Record<string, string | number | boolean | object | null | undefined>;
+			where?: QueryWhereCondition<T, R>;
+	  };
+
+export type InsertOneParams<T = unknown, R extends string = "none"> = {
 	table: string;
 	data: T &
 		Record<string, string | number | boolean | object | null | undefined>;
+	onConflict?:
+		| {
+				columns: string[];
+				action: OnConflictAction<T, R>;
+		  }
+		| {
+				constraint: string;
+				action: OnConflictAction<T, R>;
+		  };
 	returning?: (keyof T)[] | string[];
-};
+} & (IncludesNone<R> extends true
+	? { relations?: Relations<Exclude<R, "none">> }
+	: { relations: Relations<R> });
 
-export type InsertManyParams<T = unknown> = {
+export type InsertManyParams<T = unknown, R extends string = "none"> = {
 	table: string;
 	data: Array<T>;
+	onConflict?:
+		| {
+				columns: string[];
+				action: OnConflictAction<T, R>;
+		  }
+		| {
+				constraint: string;
+				action: OnConflictAction<T, R>;
+		  };
 	returning?: (keyof T)[] | string[];
-};
+} & (IncludesNone<R> extends true
+	? { relations?: Relations<Exclude<R, "none">> }
+	: { relations: Relations<R> });
 
 export type UpdateManyParams<T = unknown, R extends string = "none"> = {
 	table: string;
