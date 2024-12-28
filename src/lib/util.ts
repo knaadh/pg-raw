@@ -174,49 +174,54 @@ export function raw(strings: TemplateStringsArray, ...values: unknown[]) {
 }
 
 /**
- * Binds named parameters to a SQL query, converting them to PostgreSQL's numbered placeholder format.
+ * Converts a SQL query with named placeholders to a PostgreSQL-style parameterized query.
  *
- * This function transforms SQL queries that use `:paramName` style named placeholders
- * into PostgreSQL's numbered `$1, $2, ...` placeholder format, while collecting the
- * corresponding parameter values.
+ * This function transforms SQL queries that use @paramName style placeholders into
+ * PostgreSQL's $1, $2, etc. numbered placeholder format, while collecting the corresponding
+ * parameter values in the correct order.
  *
- * @param sqlQuery - The original SQL query string containing named placeholders
- * @param paramValues - An object mapping placeholder names to their corresponding values
- * @returns An object with the modified query text and an ordered array of parameter values
- * @throws {Error} If the query is empty or a placeholder is missing a corresponding value
+ * @param {string} sqlQuery - The original SQL query with named placeholders (e.g., 'SELECT * FROM users WHERE id = @userId')
+ * @param {Record<string, unknown>} paramValues - An object containing parameter names and their values
+ *
+ * @returns {Object} An object with two properties:
+ * - `text`: The modified SQL query with PostgreSQL-style numbered placeholders
+ * - `values`: An array of parameter values in the order they appear in the query
+ *
+ * @throws {Error} If the query text is empty or if a placeholder is missing a corresponding value
  *
  * @example
- * const result = bindParams(
- *   'SELECT * FROM users WHERE name = :userName AND age > :minAge',
- *   { userName: 'John', minAge: 25 }
- * );
+ * const query = bindParams('SELECT * FROM users WHERE id = @userId', { userId: 123 });
  * // Returns: {
- * //   text: 'SELECT * FROM users WHERE name = $1 AND age > $2',
- * //   values: ['John', 25]
+ * //   text: 'SELECT * FROM users WHERE id = $1',
+ * //   values: [123]
  * // }
  */
 export function bindParams(
 	sqlQuery: string,
-	paramValues: Record<string, string | number | boolean | Date | null>,
+	paramValues: Record<string, unknown>,
 ): {
 	text: string;
-	values: (string | number | boolean | Date | null)[];
+	values: unknown[];
 } {
 	if (!sqlQuery) {
 		throw new Error("Query text cannot be empty");
 	}
 
-	const values: (string | number | boolean | Date | null)[] = [];
+	const values: unknown[] = [];
 	let parameterIndex = 0;
 
-	// Replace named placeholders with PostgreSQL-style numbered placeholders
+	// Match placeholders outside single or double quotes
 	const parametrizedQueryText = sqlQuery.replace(
-		/:[a-zA-Z]\w*/g,
-		(placeholder) => {
-			const paramName = placeholder.slice(1);
+		/('[^']*'|"[^"]*")|@(\w+)/g,
+		(match, quoted, paramName) => {
+			// If it's a quoted string, return as-is
+			if (quoted) {
+				return match;
+			}
 
+			// Replace placeholders with PostgreSQL-style numbered placeholders
 			if (!(paramName in paramValues)) {
-				throw new Error(`Missing value for placeholder: ${placeholder}`);
+				throw new Error(`Missing value for placeholder: @${paramName}`);
 			}
 
 			values.push(paramValues[paramName]);
