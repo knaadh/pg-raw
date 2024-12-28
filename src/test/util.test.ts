@@ -321,19 +321,19 @@ describe("raw", () => {
 describe("bindParams", () => {
 	it("should convert simple named parameters to numbered placeholders", () => {
 		const result = bindParams(
-			"SELECT * FROM users WHERE name = :userName AND age = :userAge",
+			"SELECT * FROM users WHERE name = @userName AND age = @userAge LIMIT 1",
 			{ userName: "John", userAge: 30 },
 		);
 
 		expect(result).toEqual({
-			text: "SELECT * FROM users WHERE name = $1 AND age = $2",
+			text: "SELECT * FROM users WHERE name = $1 AND age = $2 LIMIT 1",
 			values: ["John", 30],
 		});
 	});
 
 	it("should handle multiple occurrences of the same parameter", () => {
 		const result = bindParams(
-			"SELECT * FROM users WHERE name = :userName OR nickname = :userName",
+			"SELECT * FROM users WHERE name = @userName OR nickname = @userName",
 			{ userName: "John" },
 		);
 
@@ -346,7 +346,7 @@ describe("bindParams", () => {
 	it("should support different value types", () => {
 		const date = new Date("2023-01-01");
 		const result = bindParams(
-			"INSERT INTO logs (message, timestamp, is_error) VALUES (:message, :timestamp, :isError)",
+			"INSERT INTO logs (message, timestamp, is_error) VALUES (@message, @timestamp, @isError)",
 			{
 				message: "Test log",
 				timestamp: date,
@@ -362,7 +362,7 @@ describe("bindParams", () => {
 
 	it("should handle null values", () => {
 		const result = bindParams(
-			"SELECT * FROM users WHERE name = :userName AND email = :email",
+			"SELECT * FROM users WHERE name = @userName AND email = @email",
 			{ userName: "John", email: null },
 		);
 
@@ -375,10 +375,12 @@ describe("bindParams", () => {
 	it("should throw an error for missing parameters", () => {
 		expect(() => {
 			bindParams(
-				"SELECT * FROM users WHERE name = :userName AND age = :userAge",
-				{ userName: "John" },
+				"SELECT * FROM users WHERE name = '@userName' AND age = @userAge",
+				{
+					userName: "John",
+				},
 			);
-		}).toThrow("Missing value for placeholder: :userAge");
+		}).toThrow("Missing value for placeholder: @userAge");
 	});
 
 	it("should throw an error for empty query", () => {
@@ -389,13 +391,22 @@ describe("bindParams", () => {
 
 	it("should handle complex queries with multiple parameter types", () => {
 		const result = bindParams(
-			"SELECT * FROM products WHERE price > :minPrice AND category = :category AND active = :isActive",
+			"SELECT * FROM products WHERE price > @minPrice AND category = @category AND active = @isActive",
 			{ minPrice: 10.99, category: "electronics", isActive: true },
 		);
 
 		expect(result).toEqual({
 			text: "SELECT * FROM products WHERE price > $1 AND category = $2 AND active = $3",
 			values: [10.99, "electronics", true],
+		});
+	});
+
+	it("should return the same query and values if no parameters are found", () => {
+		const result = bindParams("SELECT * FROM users", {});
+
+		expect(result).toEqual({
+			text: "SELECT * FROM users",
+			values: [],
 		});
 	});
 });
