@@ -210,15 +210,10 @@ export function bindParams(
 	const values: unknown[] = [];
 	let parameterIndex = 0;
 
-	// Match placeholders outside single or double quotes
+	// Match placeholders inside or outside single or double quotes
 	const parametrizedQueryText = sqlQuery.replace(
-		/('[^']*'|"[^"]*")|@(\w+)/g,
-		(match, quoted, paramName) => {
-			// If it's a quoted string, return as-is
-			if (quoted) {
-				return match;
-			}
-
+		/(['"]?)@(\w+)\1/g,
+		(_, __, paramName) => {
 			// Replace placeholders with PostgreSQL-style numbered placeholders
 			if (!(paramName in paramValues)) {
 				throw new Error(`Missing value for placeholder: @${paramName}`);

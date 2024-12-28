@@ -1,4 +1,7 @@
 import { describe, expect, it } from "bun:test";
+import { findMany } from "../lib/find";
+import { insertOne } from "../lib/insert";
+import { updateMany } from "../lib/update";
 import {
 	bindParams,
 	concat,
@@ -407,6 +410,70 @@ describe("bindParams", () => {
 		expect(result).toEqual({
 			text: "SELECT * FROM users",
 			values: [],
+		});
+	});
+
+	it("should work with findMany query", () => {
+		const query = findMany({
+			table: "users",
+			query: {
+				select: {
+					id: true,
+					first_name: true,
+					last_name: true,
+				},
+				where: {
+					gender: "@gender::text",
+				},
+				limit: 10,
+			},
+		});
+		const result = bindParams(query, { gender: "male", limit: 10 });
+
+		expect(result).toEqual({
+			text: 'SELECT "id", "first_name", "last_name" FROM "users" WHERE "gender" = $1::text LIMIT 10',
+			values: ["male"],
+		});
+	});
+
+	it("should work with InsertOne query", () => {
+		const query = insertOne({
+			table: "users",
+			data: {
+				first_name: "@first_name",
+				last_name: "@last_name",
+			},
+		});
+		const result = bindParams(query, { first_name: "John", last_name: "Snow" });
+
+		expect(result).toEqual({
+			text: 'INSERT INTO "users" ("first_name", "last_name") VALUES ($1, $2)',
+			values: ["John", "Snow"],
+		});
+	});
+
+	it("should work with updateMany query", () => {
+		const query = updateMany({
+			table: "users",
+			query: {
+				data: {
+					first_name: "@first_name",
+					last_name: "@last_name",
+				},
+				where: {
+					id: "@id",
+				},
+			},
+		});
+		const result = bindParams(query, {
+			first_name: "John",
+			last_name: "Snow",
+			id: 1,
+		});
+
+		expect(result).toEqual({
+			text: 'UPDATE "users" SET "first_name" = $1, "last_name" = $2 WHERE "id" = $3',
+			values: ["John", "Snow", 1],
 		});
 	});
 });
