@@ -114,7 +114,7 @@ export function concat(table: string, column: string): string {
  * Generates a PostgreSQL function call string.
  *
  * @param functionName - The name of the PostgreSQL function.
- * @param args - The arguments to pass to the PostgreSQL function, which can be strings (identifiers or literals) or numbers.
+ * @param args - The arguments to pass to the PostgreSQL function, which can be strings, numbers, or booleans.
  * @returns The formatted PostgreSQL function call string.
  *
  * @example
@@ -123,22 +123,9 @@ export function concat(table: string, column: string): string {
  */
 export function pgFn(
 	functionName: PgFunction | (string & {}),
-	...args: (string | number)[]
+	...args: (string | number | boolean)[]
 ): string {
-	const formattedArgs = args
-		.map((arg) => {
-			if (typeof arg === "string") {
-				// Check if arg is a column name or a string literal
-				if (arg.match(/^[a-z0-9_]+$/i)) {
-					return quoteIdentifier(arg);
-				}
-				return arg;
-			}
-			return arg.toString();
-		})
-		.join(", ");
-
-	return `${functionName}(${formattedArgs})`;
+	return `${functionName}(${args.join(", ")})`;
 }
 
 /**
