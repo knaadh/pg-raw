@@ -30,4 +30,20 @@ describe("index", () => {
 	it("should export raw function", () => {
 		expect(index.raw).toBe(index.raw);
 	});
+
+	it("should export bindParams function", () => {
+		expect(index.bindParams).toBe(index.bindParams);
+	});
+
+	it("should export quoteIdentifier function", () => {
+		expect(index.quoteIdentifier).toBe(index.quoteIdentifier);
+	});
+
+	it("should export escapeStringLiteral function", () => {
+		expect(index.escapeStringLiteral).toBe(index.escapeStringLiteral);
+	});
+
+	it("should export formatValue function", () => {
+		expect(index.formatValue).toBe(index.formatValue);
+	});
 });
