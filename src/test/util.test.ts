@@ -268,8 +268,8 @@ describe("escapeStringLiteral", () => {
 
 describe("pgFn", () => {
 	it("formats the COUNT function correctly", () => {
-		const result = pgFn("COUNT", "id");
-		expect(result).toBe('COUNT("id")');
+		const result = pgFn("COUNT", "NULL");
+		expect(result).toBe("COUNT(NULL)");
 	});
 
 	it("handles string literals and concatenation in CONCAT function", () => {
@@ -279,7 +279,7 @@ describe("pgFn", () => {
 
 	it("formats the SUM function with a column name", () => {
 		const result = pgFn("SUM", "revenue");
-		expect(result).toBe('SUM("revenue")');
+		expect(result).toBe("SUM(revenue)");
 	});
 
 	it("handles numerical arguments correctly", () => {
@@ -289,12 +289,17 @@ describe("pgFn", () => {
 
 	it("correctly identifies and formats multiple column names", () => {
 		const result = pgFn("MAX", "age", "salary");
-		expect(result).toBe('MAX("age", "salary")');
+		expect(result).toBe("MAX(age, salary)");
 	});
 
 	it("handles mixed arguments (column names and literals)", () => {
 		const result = pgFn("CONCAT", "firstName", "' '", "lastName");
-		expect(result).toBe('CONCAT("firstName", \' \', "lastName")');
+		expect(result).toBe("CONCAT(firstName, ' ', lastName)");
+	});
+
+	it("should handle boolean arguments", () => {
+		const result = pgFn("IS_BOOLEAN", true);
+		expect(result).toBe("IS_BOOLEAN(true)");
 	});
 });
 
