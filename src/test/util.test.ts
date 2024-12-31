@@ -484,8 +484,8 @@ describe("bindParams", () => {
 
 	it("should bind identifiers correctly", () => {
 		const result = bindParams(
-			"SELECT @pgIdent_id FROM products WHERE category = @category AND active = @isActive",
-			{ pgIdent_id: "id", category: "electronics", isActive: true },
+			"SELECT @@id FROM products WHERE category = @category AND active = @isActive",
+			{ id: "id", category: "electronics", isActive: true },
 		);
 
 		expect(result).toEqual({
@@ -504,15 +504,40 @@ describe("bindParams", () => {
 					last_name: true,
 				},
 				where: {
-					"@pgIdent_col": "@id",
+					"@@id": 1,
+					age: "@age",
 				},
 			},
 		});
-		const result = bindParams(query, { id: 1, pgIdent_col: "uid" });
+		const result = bindParams(query, { id: "users.uid", age: 18 });
 
 		expect(result).toEqual({
-			text: 'SELECT "id", "first_name", "last_name" FROM "users" WHERE "uid" = $1',
-			values: [1],
+			text: 'SELECT "id", "first_name", "last_name" FROM "users" WHERE "users"."uid" = 1 AND "age" = $1',
+			values: [18],
+		});
+	});
+
+	it("should ignore invalid placeholders", () => {
+		const query = findMany({
+			table: "users",
+			query: {
+				select: {
+					id: true,
+					first_name: true,
+					last_name: true,
+				},
+				where: {
+					name: "@name",
+					email: "user@email",
+					type: "@type@rt",
+				},
+			},
+		});
+		const result = bindParams(query, { name: "John" });
+
+		expect(result).toEqual({
+			text: `SELECT "id", "first_name", "last_name" FROM "users" WHERE "name" = $1 AND "email" = 'user@email' AND "type" = '@type@rt'`,
+			values: ["John"],
 		});
 	});
 });

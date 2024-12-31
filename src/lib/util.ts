@@ -1,6 +1,8 @@
 import { identifierRegex, valueRegex } from "./const";
 import type { PgFunction } from "./types";
 
+const placeholderRegex = /(?<![\w.@])(['"]?)(@@?)(\w+)\1(?![\w.@])/g;
+
 /**
  * Formats a value for use in a SQL query.
  *
@@ -197,19 +199,21 @@ export function bindParams(
 	const values: unknown[] = [];
 	let parameterIndex = 0;
 
-	// Match placeholders inside or outside single or double quotes
 	const parametrizedQueryText = sqlQuery.replace(
-		/(['"]?)@(\w+)\1/g,
-		(_, __, paramName) => {
-			// Replace placeholders with PostgreSQL-style numbered placeholders
+		placeholderRegex,
+		(_, __, prefix, paramName) => {
+			// Validate parameter existence
 			if (!(paramName in paramValues)) {
-				throw new Error(`Missing value for placeholder: @${paramName}`);
+				throw new Error(`Missing value for placeholder: ${prefix}${paramName}`);
 			}
 
-			if (paramName.startsWith("pgIdent_")) {
+			// Differentiate between identifier and value placeholders
+			if (prefix === "@@") {
+				// Identifier placeholder (for table/column names)
 				return `${quoteIdentifier(paramValues[paramName])}`;
 			}
 
+			// Value placeholder
 			values.push(paramValues[paramName]);
 			return `$${++parameterIndex}`;
 		},
