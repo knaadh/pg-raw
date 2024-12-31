@@ -60,8 +60,8 @@ export type SelectQuery<T = unknown, R extends string = "none"> = {
 	groupBy?: GroupBy<T>;
 	having?: QueryHavingCondition;
 	orderBy?: OrderBy<T, R>;
-	limit?: number;
-	offset?: number;
+	limit?: number | string;
+	offset?: number | string;
 	leftJoin?: Join<T, R>;
 	rightJoin?: Join<T, R>;
 	innerJoin?: Join<T, R>;
