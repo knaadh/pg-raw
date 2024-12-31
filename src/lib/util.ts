@@ -206,6 +206,10 @@ export function bindParams(
 				throw new Error(`Missing value for placeholder: @${paramName}`);
 			}
 
+			if (paramName.startsWith("pgIdent_")) {
+				return `${quoteIdentifier(paramValues[paramName])}`;
+			}
+
 			values.push(paramValues[paramName]);
 			return `$${++parameterIndex}`;
 		},
