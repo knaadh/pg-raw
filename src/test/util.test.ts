@@ -481,4 +481,38 @@ describe("bindParams", () => {
 			values: ["John", "Snow", 1],
 		});
 	});
+
+	it("should bind identifiers correctly", () => {
+		const result = bindParams(
+			"SELECT @pgIdent_id FROM products WHERE category = @category AND active = @isActive",
+			{ pgIdent_id: "id", category: "electronics", isActive: true },
+		);
+
+		expect(result).toEqual({
+			text: 'SELECT "id" FROM products WHERE category = $1 AND active = $2',
+			values: ["electronics", true],
+		});
+	});
+
+	it("should bind identifiers correctly for generated query", () => {
+		const query = findMany({
+			table: "users",
+			query: {
+				select: {
+					id: true,
+					first_name: true,
+					last_name: true,
+				},
+				where: {
+					"@pgIdent_col": "@id",
+				},
+			},
+		});
+		const result = bindParams(query, { id: 1, pgIdent_col: "uid" });
+
+		expect(result).toEqual({
+			text: 'SELECT "id", "first_name", "last_name" FROM "users" WHERE "uid" = $1',
+			values: [1],
+		});
+	});
 });
