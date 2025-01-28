@@ -96,6 +96,12 @@ describe("where", () => {
 		expect(where({ score: { notBetween: [30, 60] } })).toBe(
 			`"score" NOT BETWEEN 30 AND 60`,
 		);
+
+		// Test for IS NULL operator
+		expect(where({ score: { is: "NULL" } })).toBe(`"score" IS NULL`);
+
+		// Test for IS NOT NULL operator
+		expect(where({ score: { is: "NOT NULL" } })).toBe(`"score" IS NOT NULL`);
 	});
 
 	it("should handle EXISTS subquery expression", () => {

@@ -73,6 +73,18 @@ describe("formatValue", () => {
 		const result = formatValue(input);
 		expect(result).toEqual("(1, NULL, 'it', true)");
 	});
+
+	it("should return NULL as it is", () => {
+		const input = "NULL";
+		const result = formatValue(input);
+		expect(result).toEqual("NULL");
+	});
+
+	it("should return NOT NULL as it is", () => {
+		const input = "NOT NULL";
+		const result = formatValue(input);
+		expect(result).toEqual("NOT NULL");
+	});
 });
 
 describe("quoteIdentifier", () => {

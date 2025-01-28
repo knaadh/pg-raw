@@ -13,6 +13,7 @@ export enum Operators {
 	notBetween = "NOT BETWEEN",
 	in = "IN",
 	notIn = "NOT IN",
+	is = "IS",
 }
 
 export enum RelationType {
@@ -108,7 +109,7 @@ export type QueryFilter =
 				string | number | Date | null,
 				string | number | Date | null,
 			];
-			is?: "NOT NULL" | "NULL";
+			is?: "NOT NULL" | "NULL" | null;
 	  }
 	| Record<string, string | boolean | number>;
 

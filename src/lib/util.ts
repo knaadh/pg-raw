@@ -1,7 +1,5 @@
-import { identifierRegex, valueRegex } from "./const";
+import { identifierRegex, placeholderRegex, valueRegex } from "./const";
 import type { PgFunction } from "./types";
-
-const placeholderRegex = /(?<![\w.@])(['"]?)(@@?)(\w+)\1(?![\w.@])/g;
 
 /**
  * Formats a value for use in a SQL query.
