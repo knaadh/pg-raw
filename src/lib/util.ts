@@ -210,7 +210,13 @@ export function bindParams(
 				throw new Error(`Missing value for placeholder: ${prefix}${paramName}`);
 			}
 
-			// Differentiate between identifier and value placeholders
+			// Differentiate between different types of placeholders
+			if (prefix === "@@@") {
+				// Raw placeholder (for operators and other special elements)
+				// This will insert the value as-is without any transformation
+				return `${paramValues[paramName]}`;
+			}
+
 			if (prefix === "@@") {
 				// Identifier placeholder (for table/column names)
 				return `${quoteIdentifier(paramValues[paramName])}`;
