@@ -44,6 +44,11 @@ export function quoteIdentifier(identifier: unknown): unknown {
 		// If the input is a string representation of a number, return it as is
 		return identifier;
 	}
+
+	if (typeof identifier === "string" && identifier.startsWith("RAW_FLAG:")) {
+		return identifier.replace("RAW_FLAG:", "");
+	}
+
 	if (
 		typeof identifier === "string" &&
 		!identifierRegex.test(identifier) &&
