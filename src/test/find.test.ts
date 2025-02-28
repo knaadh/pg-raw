@@ -1,6 +1,7 @@
 import { describe, expect, it } from "bun:test";
 import { findMany } from "../lib/find";
 import type { FindManyParams, Relations } from "../lib/types";
+import { raw } from "../lib/util";
 
 const relations: Relations = {
 	albums: {
@@ -373,6 +374,22 @@ describe("findMany", () => {
 		const result = findMany(param);
 		expect(result).toBe(
 			`SELECT "id", "name" FROM "artist" WHERE EXISTS(SELECT 1 FROM "records" WHERE "type" = 'Master')`,
+		);
+	});
+
+	it("should generate a SELECT query with raw util function in select clause", () => {
+		const param: FindManyParams = {
+			table: "artist",
+			query: {
+				select: {
+					id: true,
+					countries: raw`meta->'countries'`,
+				},
+			},
+		};
+		const result = findMany(param);
+		expect(result).toBe(
+			`SELECT "id", meta->'countries' AS "countries" FROM "artist"`,
 		);
 	});
 });

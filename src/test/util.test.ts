@@ -183,6 +183,12 @@ describe("quoteIdentifier", () => {
 		const result = quoteIdentifier(value);
 		expect(result).toBe(1);
 	});
+
+	it("should not add quotes when there is a raw flag", () => {
+		const value = "RAW_FLAG:config->'allowed_regions'";
+		const result = quoteIdentifier(value);
+		expect(result).toBe("config->'allowed_regions'");
+	});
 });
 
 describe("concat", () => {
