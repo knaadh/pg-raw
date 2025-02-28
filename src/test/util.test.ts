@@ -558,4 +558,45 @@ describe("bindParams", () => {
 			values: ["John"],
 		});
 	});
+
+	it("should bind all three types of placeholders", () => {
+		const query = findMany({
+			table: "users",
+			query: {
+				select: {
+					id: true,
+					first_name: true,
+					last_name: true,
+				},
+				where: {
+					id: 1,
+					"@@column": {
+						"@@@operator": "@age",
+					},
+				},
+			},
+		});
+		const result = bindParams(query, {
+			column: "age",
+			operator: ">",
+			age: 18,
+		});
+
+		expect(result).toEqual({
+			text: 'SELECT "id", "first_name", "last_name" FROM "users" WHERE "id" = 1 AND "age" > $1',
+			values: [18],
+		});
+	});
+
+	it("should bind raw value placeholder", () => {
+		const result = bindParams(
+			"SELECT id FROM products WHERE category @@@operator 'tech' AND active = true",
+			{ operator: "=" },
+		);
+
+		expect(result).toEqual({
+			text: `SELECT id FROM products WHERE category = 'tech' AND active = true`,
+			values: [],
+		});
+	});
 });
