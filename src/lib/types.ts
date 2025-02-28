@@ -169,9 +169,9 @@ export type QueryHavingCondition =
 export type OrderDirection = "ASC" | "DESC";
 
 export type OrderBy<T = unknown, R extends string = "none"> = {
-	[K in keyof T as Exclude<K, R>]?: OrderDirection;
+	[K in keyof T as Exclude<K, R>]?: OrderDirection | (string & {});
 } & {
-	[key: string]: OrderDirection;
+	[key: string]: OrderDirection | (string & {});
 };
 
 export type Join<T, R extends string> = {
