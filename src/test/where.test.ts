@@ -48,6 +48,30 @@ describe("where", () => {
 		expect(result).toBe(`NOT("id" = 1 AND "name" = 'John')`);
 	});
 
+	it("should ignore empty AND", () => {
+		const conditions: QueryWhereCondition = { id: 1, AND: [] };
+		const result = where(conditions);
+		expect(result).toBe(`"id" = 1`);
+	});
+
+	it("should ignore empty OR", () => {
+		const conditions: QueryWhereCondition = { id: 1, OR: [] };
+		const result = where(conditions);
+		expect(result).toBe(`"id" = 1`);
+	});
+
+	it("should ignore empty NOT", () => {
+		const conditions = { id: 1, NOT: {} };
+		const result = where(conditions);
+		expect(result).toBe(`"id" = 1`);
+	});
+
+	it("should ignore nested empty operators", () => {
+		const conditions = { id: 1, AND: [{ OR: [{ AND: [] }] }] };
+		const result = where(conditions);
+		expect(result).toBe(`"id" = 1`);
+	});
+
 	it("should handle different types of operators", () => {
 		// Test for greaterThan and lessThan
 		expect(where({ id: { greaterThan: 1, lessThan: 10 } })).toBe(

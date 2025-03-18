@@ -115,16 +115,23 @@ function handleLogicalOperator(
 	whereClauses: string[],
 ) {
 	if (operator === "NOT") {
-		whereClauses.push(
-			`NOT(${where(value as QueryWhereCondition, "AND", relations)})`,
-		);
+		const notClause = where(value as QueryWhereCondition, "AND", relations);
+		if (notClause !== "") {
+			whereClauses.push(`NOT(${notClause})`);
+		}
 		return;
 	}
 	const subWhereClauses: string[] = [];
 	for (const condition of value as QueryWhereCondition[]) {
-		subWhereClauses.push(`${where(condition, operator, relations)}`);
+		const whereClause = where(condition, operator, relations);
+		if (whereClause !== "") {
+			subWhereClauses.push(whereClause);
+		}
 	}
-	whereClauses.push(`(${subWhereClauses.join(` ${operator} `)})`);
+
+	if (subWhereClauses.length > 0) {
+		whereClauses.push(`(${subWhereClauses.join(` ${operator} `)})`);
+	}
 	return;
 }
 
