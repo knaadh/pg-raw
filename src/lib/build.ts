@@ -48,17 +48,18 @@ export function buildSelectQuery<T = unknown, R extends string = "none">(
 
 	// Handle include
 	if (query.include) {
-		for (const [relation, relationQuery] of Object.entries(query.include)) {
-			if (!relations[relation]) {
-				throw new Error(`Relation ${relation} is not defined`);
+		for (const [relationName, relationQuery] of Object.entries(query.include)) {
+			const relation = relations[relationName];
+			if (!relation) {
+				throw new Error(`Relation ${relationName} is not defined`);
 			}
 			const innerQuery = buildSelectQuery(
-				relation,
+				relationName,
 				relationQuery,
 				relations,
 				true,
 			);
-			args.join += join("LEFT LATERAL", relations[relation], innerQuery);
+			args.join += join("LEFT LATERAL", relation, innerQuery);
 		}
 	}
 
@@ -214,11 +215,11 @@ export function sql(
 	},
 ): string {
 	let sql = `${params?.select || params?.delete || params?.update || ""}`;
-	if (params.join) {
-		sql += `${params.join}`;
-	}
 	if (append?.join) {
 		sql += `${append?.join}`;
+	}
+	if (params.join) {
+		sql += `${params.join}`;
 	}
 	if (params.where && Object.keys(params.where).length > 0) {
 		sql += ` WHERE ${where(params.where, "AND", params.relations || {})}`;

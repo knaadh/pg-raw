@@ -37,7 +37,7 @@ describe("sql", () => {
 		};
 		const result = sql(params, append);
 		expect(result).toBe(
-			"SELECT * FROM table JOIN other_table ON table.id = other_table.table_id JOIN another_table ON table.id = another_table.table_id",
+			"SELECT * FROM table JOIN another_table ON table.id = another_table.table_id JOIN other_table ON table.id = other_table.table_id",
 		);
 	});
 
@@ -101,7 +101,7 @@ describe("sql", () => {
 		};
 		const result = sql(params, append);
 		expect(result).toBe(
-			`SELECT * FROM table JOIN other_table ON table.id = other_table.table_id JOIN another_table ON table.id = another_table.table_id WHERE "id" = 1 AND other_table.name = "test" GROUP BY "name" HAVING COUNT("name") = 1 ORDER BY "name" ASC LIMIT 10 OFFSET 5 RETURNING "id", "name"`,
+			`SELECT * FROM table JOIN another_table ON table.id = another_table.table_id JOIN other_table ON table.id = other_table.table_id WHERE "id" = 1 AND other_table.name = "test" GROUP BY "name" HAVING COUNT("name") = 1 ORDER BY "name" ASC LIMIT 10 OFFSET 5 RETURNING "id", "name"`,
 		);
 	});
 });
