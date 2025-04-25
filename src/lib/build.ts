@@ -24,6 +24,7 @@ export function buildSelectQuery<T = unknown, R extends string = "none">(
 		where?: string;
 		join?: string;
 	},
+	tableAlias?: string,
 ): string {
 	const columns: Select = {
 		...(query.select || {}),
@@ -58,6 +59,8 @@ export function buildSelectQuery<T = unknown, R extends string = "none">(
 				relationQuery,
 				relations,
 				true,
+				undefined,
+				relation.tableAlias,
 			);
 			args.join += join("LEFT LATERAL", relation, innerQuery);
 		}
@@ -114,7 +117,7 @@ export function buildSelectQuery<T = unknown, R extends string = "none">(
 	// Handle nested queries
 	if (isNested) {
 		const relation: Relation = relations[key];
-		args.select = `${select(columns, table, "object", key)}`;
+		args.select = `${select(columns, tableAlias ? `${quoteIdentifier(table)} AS ${quoteIdentifier(tableAlias)}` : table, "object", key)}`;
 		let innerSql: string;
 
 		if (relation.junction) {
@@ -125,10 +128,10 @@ export function buildSelectQuery<T = unknown, R extends string = "none">(
 				key,
 			)}`;
 			innerSql = sql(args, {
-				join: ` LEFT JOIN ${quoteIdentifier(relation.table)} ON ${connect(
+				join: ` LEFT JOIN ${quoteIdentifier(relation.tableAlias ? `${quoteIdentifier(relation.table)} AS ${quoteIdentifier(relation.tableAlias)}` : relation.table)} ON ${connect(
 					relation.junction.table,
 					relation.junction.field,
-					relation.table,
+					relation.tableAlias || relation.table,
 					relation.field,
 				)}`,
 				where: `${connect(
@@ -141,7 +144,7 @@ export function buildSelectQuery<T = unknown, R extends string = "none">(
 		} else {
 			innerSql = sql(args, {
 				where: `${connect(
-					relation.table,
+					relation.tableAlias || relation.table,
 					relation.field,
 					relation.referenceTable,
 					relation.referenceField,
@@ -156,7 +159,7 @@ export function buildSelectQuery<T = unknown, R extends string = "none">(
 	}
 
 	// Build final select query for non-nested
-	args.select = `${select(columns, key)}`;
+	args.select = `${select(columns, tableAlias ? `${quoteIdentifier(key)} AS ${quoteIdentifier(tableAlias)}` : key)}`;
 
 	// Return the SQL string with any additional append clauses
 	return sql(args, append);

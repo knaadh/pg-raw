@@ -392,4 +392,200 @@ describe("findMany", () => {
 			`SELECT "id", meta->'countries' AS "countries" FROM "artist"`,
 		);
 	});
+
+	it("should generate a SELECT query with table alias", () => {
+		const param: FindManyParams = {
+			table: "product_categories",
+			tableAlias: "categories",
+			query: {
+				select: {
+					id: true,
+					name: true,
+				},
+				where: {
+					parent_id: {
+						is: "NULL",
+					},
+				},
+			},
+		};
+		const result = findMany(param);
+		expect(result).toBe(
+			`SELECT "id", "name" FROM "product_categories" AS "categories" WHERE "parent_id" IS NULL`,
+		);
+	});
+
+	it("should generate a SELECT query with table alias in relationship", () => {
+		const param: FindManyParams = {
+			table: "product_categories",
+			query: {
+				select: {
+					id: true,
+					name: true,
+				},
+				where: {
+					parent_id: {
+						is: "NULL",
+					},
+				},
+				include: {
+					subcategories: {
+						select: {
+							name: true,
+						},
+					},
+				},
+			},
+			relations: {
+				subcategories: {
+					type: "MANY",
+					table: "product_categories",
+					tableAlias: "sub_categories",
+					field: "parent_id",
+					referenceTable: "product_categories",
+					referenceField: "id",
+				},
+			},
+		};
+		const result = findMany(param);
+		expect(result).toBe(
+			`SELECT "id", "name", "subcategories" FROM "product_categories" LEFT JOIN LATERAL (SELECT jsonb_agg("subcategories") AS "subcategories" FROM (SELECT jsonb_build_object('name', "name") AS "subcategories" FROM "product_categories" AS "sub_categories" WHERE "sub_categories"."parent_id" = "product_categories"."id") ) ON TRUE WHERE "parent_id" IS NULL`,
+		);
+	});
+
+	it("should generate a SELECT query with table alias in nested relationship", () => {
+		const param: FindManyParams = {
+			table: "offers",
+			query: {
+				select: {
+					id: true,
+					title: true,
+				},
+				include: {
+					payment_offers: {
+						select: {
+							title: true,
+							description: true,
+						},
+						where: {
+							is_active: true,
+						},
+						include: {
+							payment_method: {
+								select: {
+									name: true,
+									logo: true,
+									type: true,
+								},
+							},
+						},
+					},
+				},
+			},
+			relations: {
+				payment_offers: {
+					type: "MANY",
+					table: "payment_offers",
+					tableAlias: "po",
+					field: "id",
+					referenceTable: "offers",
+					referenceField: "id",
+					junction: {
+						table: "offer_payment_offer",
+						field: "payment_offer_id",
+						referenceField: "offer_id",
+					},
+				},
+				payment_method: {
+					table: "payment_methods",
+					tableAlias: "pm",
+					field: "id",
+					referenceTable: "po",
+					referenceField: "payment_method_id",
+				},
+			},
+		};
+		const result = findMany(param);
+		expect(result).toBe(
+			`SELECT "id", "title", "payment_offers" FROM "offers" LEFT JOIN LATERAL (SELECT jsonb_agg("payment_offers") AS "payment_offers" FROM (SELECT jsonb_build_object('title', "title", 'description', "description", 'payment_method', "payment_method") AS "payment_offers" FROM "offer_payment_offer" LEFT JOIN "payment_offers" AS "po" ON "offer_payment_offer"."payment_offer_id" = "po"."id" LEFT JOIN LATERAL (SELECT "payment_method" FROM (SELECT jsonb_build_object('name', "name", 'logo', "logo", 'type', "type") AS "payment_method" FROM "payment_methods" AS "pm" WHERE "pm"."id" = "po"."payment_method_id") ) ON TRUE WHERE "is_active" = true AND "offer_payment_offer"."offer_id" = "offers"."id") ) ON TRUE`,
+		);
+	});
+
+	it("should generate a SELECT query with LEFT Join and table alias", () => {
+		const param: FindManyParams = {
+			table: "product_categories",
+			query: {
+				select: {
+					"product_categories.id": true,
+					"product_categories.name": true,
+				},
+				where: {
+					"product_categories.parent_id": {
+						is: "NULL",
+					},
+				},
+				leftJoin: {
+					subcategories: {
+						select: {
+							subcategory_name: "sub_categories.name",
+						},
+					},
+				},
+			},
+			relations: {
+				subcategories: {
+					type: "MANY",
+					table: "product_categories",
+					tableAlias: "sub_categories",
+					field: "parent_id",
+					referenceTable: "product_categories",
+					referenceField: "id",
+				},
+			},
+		};
+		const result = findMany(param);
+		expect(result).toBe(
+			`SELECT "product_categories"."id", "product_categories"."name", "sub_categories"."name" AS "subcategory_name" FROM "product_categories" LEFT JOIN "product_categories" AS "sub_categories" ON "sub_categories"."parent_id" = "product_categories"."id" WHERE "product_categories"."parent_id" IS NULL`,
+		);
+	});
+
+	it("should generate a SELECT query with LEFT Join using junction table and table alias", () => {
+		const param: FindManyParams = {
+			table: "offers",
+			tableAlias: "of",
+			query: {
+				select: {
+					"of.id": true,
+					title: "of.title",
+				},
+				leftJoin: {
+					payment_offers: {
+						select: {
+							payment_offer_title: "po.title",
+							payment_offer_description: "po.description",
+						},
+					},
+				},
+			},
+			relations: {
+				payment_offers: {
+					type: "MANY",
+					table: "payment_offers",
+					tableAlias: "po",
+					field: "id",
+					referenceTable: "of",
+					referenceField: "id",
+					junction: {
+						table: "offer_payment_offer",
+						field: "payment_offer_id",
+						referenceField: "offer_id",
+					},
+				},
+			},
+		};
+		const result = findMany(param);
+		expect(result).toBe(
+			`SELECT "of"."id", "of"."title" AS "title", "po"."title" AS "payment_offer_title", "po"."description" AS "payment_offer_description" FROM "offers" AS "of" LEFT JOIN "offer_payment_offer" ON "offer_payment_offer"."offer_id" = "of"."id" LEFT JOIN "payment_offers" AS "po" ON "offer_payment_offer"."payment_offer_id" = "po"."id"`,
+		);
+	});
 });
