@@ -12,6 +12,10 @@ export function join(
 		}
 		return ` LEFT JOIN LATERAL (${query}) ON TRUE`;
 	}
+	const table = relation.tableAlias
+		? `${quoteIdentifier(relation.table)} AS ${quoteIdentifier(relation.tableAlias)}`
+		: quoteIdentifier(relation.table);
+
 	if (relation.junction) {
 		return ` ${type} JOIN ${quoteIdentifier(
 			relation.junction.table,
@@ -20,15 +24,15 @@ export function join(
 			relation.junction.referenceField,
 			relation.referenceTable,
 			relation.referenceField,
-		)} ${type} JOIN ${quoteIdentifier(relation.table)} ON ${connect(
+		)} ${type} JOIN ${table} ON ${connect(
 			relation.junction.table,
 			relation.junction.field,
-			relation.table,
+			relation.tableAlias || relation.table,
 			relation.field,
 		)}`;
 	}
-	return ` ${type} JOIN ${quoteIdentifier(relation.table)} ON ${connect(
-		relation.table,
+	return ` ${type} JOIN ${table} ON ${connect(
+		relation.tableAlias || relation.table,
 		relation.field,
 		relation.referenceTable,
 		relation.referenceField,

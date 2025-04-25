@@ -49,6 +49,7 @@ export type ElementType<T> = T extends (infer U)[] ? U : T;
 
 export type FindManyParams<T = unknown, R extends string = "none"> = {
 	table: string;
+	tableAlias?: string;
 	query: SelectQuery<T, Exclude<R, "none">>;
 } & (IncludesNone<R> extends true
 	? { relations?: Relations<Exclude<R, "none">> }
@@ -195,6 +196,7 @@ export type Relations<R extends string = never> = {
 export type Relation = {
 	type?: "ONE" | "MANY";
 	table: string;
+	tableAlias?: string;
 	field: string;
 	referenceTable: string;
 	referenceField: string;
